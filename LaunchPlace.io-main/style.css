@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaunchPlace.io - Professional Websites for SMEs</title>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Cyberpunk fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Inline stylesheet -->
+  <style>
+    :root{
+      /* Dark cyberpunk base */
+      --bg: #020018;
+      --bg-alt: #05051f;
+      --card: rgba(9, 9, 35, 0.92);
+
+      /* Text */
+      --white: #f9f5ff;
+      --muted: #9ca3c9;
+
+      /* Neon accents */
+      --accent-pink: #ff2bd8;
+      --accent-cyan: #22d3ff;
+      --accent-lavender: #e879f9;
+
+      /* Backwards-compat vars */
+      --accent: var(--accent-pink);
+      --accent-2: var(--accent-cyan);
+
+      --glass: rgba(148, 163, 255, 0.18);
+      --glass-2: rgba(15, 23, 42, 0.86);
+
+      --max-width:1200px;
+      --radius:18px;
+
+      --font-display: "Russo One", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-body: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      font-family: var(--font-body);
+    }
+
+    html,body{height:100%;}
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 10% -10%, rgba(255,43,216,0.32), transparent 60%),
+        radial-gradient(circle at 90% 110%, rgba(34,211,255,0.28), transparent 60%),
+        radial-gradient(circle at 50% 10%, rgba(232,121,249,0.24), transparent 55%),
+        #020018;
+      color:var(--white);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* full-screen animated canvas behind content */
+    #bgCanvas{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      display:block;
+      mix-blend-mode:screen;
+      opacity:0.9;
+    }
+
+    /* ✅ changed z-index to 2 so it sits ABOVE image */
+    .bg-gradient-overlay{
+      position:fixed;
+      inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.75));
+      z-index:2;
+      pointer-events:none;
+    }
+
+    /* cyberpunk art / poster layer (now using your file) */
+    /* ✅ changed image path, opacity, and z-index */
+    .bg-art-layer{
+      position:fixed;
+      inset:0;
+      background-image:url("space bg.png"); /* your PNG in same folder */
+      background-size:cover;
+      background-position:center;
+      mix-blend-mode:screen;
+      opacity:0.25;       /* you can tweak 0.18–0.4 */
+      z-index:1;          /* between canvas and gradient */
+      pointer-events:none;
+    }
+
+    .container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 20px;
+      position:relative;
+      z-index:5;
+    }
+
+    /* NAVBAR */
+    .navbar{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:linear-gradient(to bottom, rgba(2,0,24,0.95), rgba(2,0,24,0.7), transparent);
+      padding:18px 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-container{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .logo a{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .logo img{
+      display:block;
+      border-radius:8px;
+      box-shadow:0 0 22px rgba(232,121,249,0.65);
+    }
+
+    .logo-text{
+      font-family: var(--font-display);
+      font-weight:800;
+      font-size:.92rem;
+      letter-spacing:.24em;
+      text-transform:uppercase;
+      color:var(--white);
+    }
+
+    #site-title-header{display:none}
+
+    .nav-menu{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      list-style:none;
+      padding:0;
+      margin:0;
+      font-family: var(--font-body);
+      text-transform:uppercase;
+      font-size:.72rem;
+      letter-spacing:.14em;
+    }
+
+    .nav-link{
+      color:var(--muted);
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:600;
+    }
+
+    .nav-link:hover,
+    .nav-link.active{
+      color:var(--white);
+      background:rgba(15,23,42,0.85);
+      box-shadow:0 0 18px rgba(148,163,255,0.45);
+    }
+
+    .nav-cta{
+      background:linear-gradient(120deg,var(--accent-cyan),var(--accent-lavender),var(--accent-pink));
+      padding:8px 14px;
+      border-radius:999px;
+      color:var(--white);
+      text-decoration:none;
+      font-weight:700;
+      border:1px solid rgba(255,255,255,0.16);
+      box-shadow:0 0 20px rgba(232,121,249,0.6);
+    }
+
+    .hamburger{
+      display:none;
+      flex-direction:column;
+      gap:6px;
+      width:34px;
+      cursor:pointer;
+    }
+
+    .hamburger span{
+      height:3px;
+      background:var(--white);
+      display:block;
+      border-radius:3px;
+      opacity:0.9;
+    }
+
+    /* HERO */
+    .hero{
+      padding:80px 0 60px;
+      position:relative;
+      overflow:visible;
+    }
+
+    .hero-background{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+
+    .floating-shapes{
+      position:absolute;
+      inset:0;
+    }
+
+    .hero-content{
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      align-items:flex-start;
+      max-width:720px;
+    }
+
+    .hero-badge{
+      background:
+        radial-gradient(circle at 0 0, rgba(255,43,216,0.6), transparent 60%),
+        rgba(6, 8, 30, 0.95);
+      padding:6px 14px;
+      border-radius:999px;
+      font-weight:700;
+      color:var(--accent-lavender);
+      border:1px solid rgba(232,121,249,0.7);
+      box-shadow:0 0 22px rgba(232,121,249,0.55);
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      font-size:.7rem;
+    }
+
+    .hero-title{
+      font-family: var(--font-display);
+      font-size:2.6rem;
+      line-height:1.05;
+      margin:0;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+    }
+
+    .hero-title .highlight{
+      background:linear-gradient(120deg,var(--accent-cyan),var(--accent-lavender),var(--accent-pink));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 0 24px rgba(255,255,255,0.25);
+    }
+
+    .hero-subtitle{
+      color:var(--muted);
+      max-width:720px;
+      font-family: var(--font-body);
+      font-size:.95rem;
+    }
+
+    .hero-stats{
+      display:flex;
+      gap:18px;
+      margin-top:14px;
+    }
+
+    .stat{
+      display:flex;
+      flex-direction:column;
+    }
+
+    .stat-number{
+      font-weight:800;
+      font-size:1.15rem;
+      font-family: var(--font-display);
+      letter-spacing:.12em;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+
+    .cta-button{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      text-decoration:none;
+      font-weight:700;
+      font-family: var(--font-body);
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+      font-size:.78rem;
+      border:1px solid transparent;
+    }
+
+    .cta-button.primary{
+      background:linear-gradient(120deg,var(--accent-cyan),var(--accent-lavender),var(--accent-pink));
+      color:var(--white);
+      box-shadow:0 0 28px rgba(232,121,249,0.7);
+      border-color:rgba(255,255,255,0.12);
+    }
+
+    .cta-button.secondary{
+      background:rgba(7, 10, 40, 0.85);
+      border:1px solid rgba(148,163,255,0.4);
+      color:var(--white);
+    }
+
+    .cta-button.large{
+      padding:14px 24px;
+      font-size:.8rem;
+    }
+
+    /* FEATURES */
+    .features{
+      padding:40px 0;
+    }
+
+    .section-header h2{
+      margin:0 0 8px;
+      font-size:1.5rem;
+    }
+
+    .section-header p{
+      color:var(--muted);
+      margin:0;
+      font-family: var(--font-body);
+      text-transform:none;
+      letter-spacing:0;
+    }
+
+    .features-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:18px;
+      margin-top:18px;
+    }
+
+    .feature-card{
+      background:var(--glass-2);
+      padding:18px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,255,0.25);
+      box-shadow:0 18px 35px rgba(2,6,23,0.9);
+    }
+
+    .feature-icon{
+      font-size:1.2rem;
+      padding-bottom:8px;
+      color:var(--accent-lavender);
+    }
+
+    .feature-card h3{
+      margin-top:0;
+      margin-bottom:6px;
+      font-size:1rem;
+    }
+
+    .feature-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    /* PRICING */
+    .pricing{
+      padding:40px 0;
+    }
+
+    .pricing-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+      margin-top:18px;
+    }
+
+    .pricing-card{
+      background:var(--glass-2);
+      padding:20px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,255,0.16);
+    }
+
+    .pricing-card.featured{
+      transform:scale(1.02);
+      box-shadow:0 22px 45px rgba(0,0,0,0.95);
+      border:1px solid rgba(232,121,249,0.8);
+    }
+
+    .popular-badge{
+      display:inline-block;
+      background:var(--accent-pink);
+      padding:6px 8px;
+      border-radius:999px;
+      font-weight:800;
+      color:#fff;
+      margin-bottom:10px;
+      font-size:.75rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .card-header h3{
+      margin:0;
+      font-size:1.05rem;
+    }
+
+    .price{
+      font-weight:900;
+      font-size:1.4rem;
+      margin-top:6px;
+    }
+
+    .features-list{
+      list-style:none;
+      padding:0;
+      margin:12px 0 16px;
+    }
+
+    .features-list li{
+      padding:6px 0;
+      color:var(--muted);
+      font-weight:600;
+      font-size:.9rem;
+    }
+
+    .package-btn{
+      display:inline-block;
+      text-decoration:none;
+      padding:10px 14px;
+      border-radius:999px;
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.18);
+      color:var(--white);
+      font-weight:700;
+      font-size:.78rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .featured-btn{
+      background:linear-gradient(120deg,var(--accent-cyan),var(--accent-lavender),var(--accent-pink));
+      border:none;
+      box-shadow:0 0 24px rgba(232,121,249,0.7);
+    }
+
+    /* FAQ */
+    .faq{
+      padding:40px 0;
+    }
+
+    .faq-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .faq-item{
+      background:var(--glass-2);
+      padding:14px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,255,0.22);
+    }
+
+    .faq-question{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      cursor:pointer;
+    }
+
+    .faq-question h3{
+      font-size:.9rem;
+      margin:0;
+    }
+
+    .faq-answer{
+      display:none;
+      padding-top:8px;
+      color:var(--muted);
+      font-size:.88rem;
+    }
+
+    /* CTA & Footer */
+    .cta{
+      padding:36px 0;
+    }
+
+    .cta-content h2{
+      margin-top:0;
+      margin-bottom:8px;
+      font-size:1.4rem;
+    }
+
+    .cta-content p{
+      margin:0 0 18px;
+      color:var(--muted);
+    }
+
+    .cta-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    footer{
+      padding:24px 0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.85));
+      margin-top:18px;
+    }
+
+    .footer-content{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      gap:12px;
+      font-size:.88rem;
+    }
+
+    .footer-section h3{
+      margin-top:0;
+      font-size:.9rem;
+    }
+
+    .footer-section p,
+    .footer-section li{
+      color:var(--muted);
+    }
+
+    .footer-section ul{
+      list-style:none;
+      padding-left:0;
+      margin:0;
+    }
+
+    .footer-section a{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:.86rem;
+    }
+
+    .footer-section a:hover{
+      color:var(--white);
+    }
+
+    .footer-bottom{
+      text-align:center;
+      padding-top:14px;
+      color:var(--muted);
+      font-size:.8rem;
+    }
+
+    .social-links a{
+      color:var(--muted);
+      text-decoration:none;
+    }
+
+    .social-links a:hover{
+      color:var(--accent-lavender);
+    }
+
+    /* === SCROLL REVEAL ANIMATION === */
+    .reveal{
+      opacity:0;
+      transform:translateY(30px);
+      transition:opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width:1000px){
+      .features-grid{grid-template-columns:repeat(2,1fr)}
+      .pricing-grid{grid-template-columns:repeat(1,1fr)}
+      .faq-grid{grid-template-columns:1fr}
+      .hero-title{font-size:2.1rem}
+    }
+
+    @media (max-width:800px){
+      .nav-menu{
+        display:none;
+        position:absolute;
+        top:72px;
+        right:18px;
+        background:var(--card);
+        padding:12px;
+        border-radius:14px;
+        box-shadow:0 18px 40px rgba(0,0,0,0.9);
+        flex-direction:column;
+        width:220px;
+      }
+
+      .hamburger{display:flex}
+      .logo-text{font-size:.8rem}
+      .container{padding:0 16px}
+      .footer-content{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width:600px){
+      .footer-content{grid-template-columns:1fr}
+      .hero{padding-top:64px}
+      .hero-title{font-size:1.9rem}
+    }
+
+    /* small helpers */
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <!-- Animated particle canvas -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="bg-gradient-overlay" aria-hidden="true"></div>
+  <div class="bg-art-layer" aria-hidden="true"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="index.html" aria-label="LaunchPlace home">
+          <img src="logo.svg" alt="LaunchPlace logo" width="56" height="56" />
+          <span class="logo-text">LAUNCHPLACE.IO</span>
+        </a>
+      </div>
+
+      <ul class="nav-menu" role="menubar">
+        <li><a href="index.html" class="nav-link active" role="menuitem">Home</a></li>
+        <li><a href="portfolio.html" class="nav-link" role="menuitem">Portfolio</a></li>
+        <li><a href="contact.html" class="nav-link" role="menuitem">Contact</a></li>
+        <li><a href="career.html" class="nav-link" role="menuitem">Career</a></li>
+        <li><a href="contact.html" class="nav-cta nav-link" role="menuitem">Get Started</a></li>
+        <li><a href="authentication/login.html" class="nav-cta nav-link" role="menuitem">Login</a></li>
+      </ul>
+
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge" aria-hidden="true">🚀 No Tech Skills Needed</div>
+
+        <h1 id="hero-heading" class="hero-title">
+          <div>Get Your Professional</div>
+          <div class="highlight">Website Today</div>
+        </h1>
+
+        <p class="hero-subtitle">We build stunning, high-converting websites for small businesses that drive real results.</p>
+
+        <div class="hero-stats" role="list">
+          <div class="stat" role="listitem">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">Websites Launched</div>
+          </div>
+
+          <div class="stat" role="listitem">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support</div>
+          </div>
+
+          <div class="stat" role="listitem">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Satisfaction</div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="contact.html" class="cta-button primary">Start Your Project <i class="fas fa-arrow-right" aria-hidden="true" style="margin-left:6px"></i></a>
+          <a href="#pricing" class="cta-button secondary">View Pricing</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features reveal" aria-labelledby="features-heading">
+    <div class="container">
+      <div class="section-header reveal" data-delay="50">
+        <h2 id="features-heading">Why Choose LaunchPlace.io?</h2>
+        <p>We make web development simple, fast, and effective for small businesses</p>
+      </div>
+
+      <div class="features-grid" role="list">
+        <div class="feature-card reveal" data-delay="50" role="listitem">
+          <div class="feature-icon"><i class="fas fa-bolt" aria-hidden="true"></i></div>
+          <h3>Lightning Fast</h3>
+          <p>Get your website live in 1-2 weeks with our streamlined process.</p>
+        </div>
+
+        <div class="feature-card reveal" data-delay="150" role="listitem">
+          <div class="feature-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
+          <h3>Mobile First</h3>
+          <p>Perfectly optimized for all devices and screen sizes.</p>
+        </div>
+
+        <div class="feature-card reveal" data-delay="250" role="listitem">
+          <div class="feature-icon"><i class="fas fa-search" aria-hidden="true"></i></div>
+          <h3>SEO Ready</h3>
+          <p>Built-in SEO optimization to help you rank on Google.</p>
+        </div>
+
+        <div class="feature-card reveal" data-delay="350" role="listitem">
+          <div class="feature-icon"><i class="fas fa-headset" aria-hidden="true"></i></div>
+          <h3>Dedicated Support</h3>
+          <p>Ongoing support and maintenance for your peace of mind.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="pricing reveal" aria-labelledby="pricing-heading">
+    <div class="container">
+      <div class="section-header reveal" data-delay="50">
+        <h2 id="pricing-heading">Simple, Transparent Pricing</h2>
+        <p>Choose the perfect package for your business needs</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card reveal" data-delay="50">
+          <div class="card-header">
+            <h3>Starter Website</h3>
+            <div class="price">₹14,999</div>
+            <p class="price-note">One-time payment</p>
+          </div>
+          <ul class="features-list">
+            <li>Up to 5 Pages</li>
+            <li>Mobile-Friendly Design</li>
+            <li>Contact Form</li>
+            <li>1 Month Free Support</li>
+            <li>Basic SEO Setup</li>
+            <li>Social Media Integration</li>
+          </ul>
+          <a href="contact.html" class="package-btn">Get Started</a>
+        </div>
+
+        <div class="pricing-card featured reveal" data-delay="150">
+          <div class="popular-badge">MOST POPULAR</div>
+          <div class="card-header">
+            <h3>Business Website</h3>
+            <div class="price">₹34,999</div>
+            <p class="price-note">One-time payment</p>
+          </div>
+          <ul class="features-list">
+            <li>Up to 10 Pages</li>
+            <li>Custom Design + Animations</li>
+            <li>WhatsApp Integration</li>
+            <li>3 Months Free Support</li>
+            <li>Advanced SEO</li>
+            <li>Image Gallery/Blog</li>
+            <li>Analytics Setup</li>
+          </ul>
+          <a href="contact.html" class="package-btn featured-btn">Get Started</a>
+        </div>
+
+        <div class="pricing-card reveal" data-delay="250">
+          <div class="card-header">
+            <h3>E-commerce Store</h3>
+            <div class="price">₹64,999</div>
+            <p class="price-note">One-time payment</p>
+          </div>
+          <ul class="features-list">
+            <li>Online Product Catalog</li>
+            <li>Secure Payment Gateway</li>
+            <li>Shopping Cart System</li>
+            <li>6 Months Free Support</li>
+            <li>Order Management</li>
+            <li>Customer Accounts</li>
+            <li>Inventory Management</li>
+          </ul>
+          <a href="contact.html" class="package-btn">Get Started</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq reveal" aria-labelledby="faq-heading">
+    <div class="container">
+      <div class="section-header reveal" data-delay="50">
+        <h2 id="faq-heading">Frequently Asked Questions</h2>
+        <p>Everything you need to know about our services</p>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item reveal" data-delay="50">
+          <div class="faq-question"><h3>How long does it take to build my website?</h3><i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p>Typically 1-2 weeks for basic sites, 2-3 weeks for e-commerce stores. We work efficiently while maintaining the highest quality standards.</p></div>
+        </div>
+
+        <div class="faq-item reveal" data-delay="150">
+          <div class="faq-question"><h3>Do I need any technical skills?</h3><i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p>Not at all! We handle everything technical. You just need to provide your content, images, and feedback throughout the process.</p></div>
+        </div>
+
+        <div class="faq-item reveal" data-delay="250">
+          <div class="faq-question"><h3>What about ongoing support?</h3><i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p>All packages include free support periods. After that, we offer affordable maintenance plans starting at just ₹1,999/month.</p></div>
+        </div>
+
+        <div class="faq-item reveal" data-delay="350">
+          <div class="faq-question"><h3>Can you update my existing website?</h3><i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p>Absolutely! We can redesign, improve, and optimize your current website to meet modern standards and improve performance.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta reveal">
+    <div class="container">
+      <div class="cta-content reveal" data-delay="50">
+        <h2>Ready to Launch Your Online Presence?</h2>
+        <p>Join 50+ satisfied businesses that trust us with their online success</p>
+        <div class="cta-actions">
+          <a href="contact.html" class="cta-button primary large">Start Your Project Today <i class="fas fa-rocket" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="logo">
+            <a href="index.html">
+              <img src="logo.svg" alt="LaunchPlace logo" width="44" height="44"/>
+              <span class="logo-text">LAUNCHPLACE.IO</span>
+            </a>
+          </div>
+          <p>Professional websites for small businesses. Fast, affordable, and effective.</p>
+          <div class="social-links" aria-hidden="true">
+            <a href="#" style="margin-right:8px"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" style="margin-right:8px"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="career.html">Career</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Services</h3>
+          <ul>
+            <li><a href="#">Website Development</a></li>
+            <li><a href="#">E-commerce Stores</a></li>
+            <li><a href="#">Website Redesign</a></li>
+            <li><a href="#">SEO Optimization</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><i class="fas fa-envelope"></i> launchplaceio@gmail.com</li>
+            <li><i class="fas fa-phone"></i> +91 79759 40152</li>
+            <li><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year"></span> LaunchPlace.io. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Inline script for particles + basic interactions -->
+  <script>
+    // set year
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // PARTICLE BACKGROUND (Canvas)
+    (function(){
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+      const DPR = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = w * DPR; canvas.height = h * DPR; canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; ctx.scale(DPR, DPR);
+
+      const colors = [
+        'rgba(255,43,216,0.38)',  // neon pink
+        'rgba(34,211,255,0.34)',  // cyan
+        'rgba(232,121,249,0.32)'  // lavender
+      ];
+
+      function rand(min, max){return Math.random()*(max-min)+min}
+
+      const particleCount = Math.min(120, Math.floor((w*h)/8000));
+      const particles = [];
+
+      function Particle(){
+        this.x = rand(0,w);
+        this.y = rand(0,h);
+        this.r = rand(1.2,6);
+        this.vx = rand(-0.2,0.6);
+        this.vy = rand(-0.2,0.6);
+        this.color = colors[Math.floor(Math.random()*colors.length)];
+        this.alpha = rand(0.2,0.9);
+      }
+      for(let i=0;i<particleCount;i++) particles.push(new Particle());
+
+      function draw(){
+        ctx.clearRect(0,0,w,h);
+
+        // subtle radial glow in center
+        const gradient = ctx.createRadialGradient(w*0.15,h*0.15,0,w*0.6,h*0.6,Math.max(w,h));
+        gradient.addColorStop(0,'rgba(12,10,30,0.06)');
+        gradient.addColorStop(1,'rgba(2,4,8,0.35)');
+        ctx.fillStyle = gradient; ctx.fillRect(0,0,w,h);
+
+        // particles
+        for(let p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -20) p.x = w + 20; if(p.x > w+20) p.x = -20;
+          if(p.y < -20) p.y = h + 20; if(p.y > h+20) p.y = -20;
+
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha * 0.9;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
+
+          // tiny halo
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = (p.alpha*0.35);
+          ctx.arc(p.x, p.y, p.r*3.6, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // connecting lines for close particles
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx = a.x-b.x, dy = a.y-b.y; const dist = Math.sqrt(dx*dx+dy*dy);
+            if(dist < 120){
+              ctx.beginPath();
+              const alpha = 0.05*(1 - dist/120);
+              ctx.strokeStyle = 'rgba(148,163,255,'+alpha+')';
+              ctx.lineWidth = 1;
+              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }
+        }
+      }
+
+      let rafId;
+      function loop(){ draw(); rafId = requestAnimationFrame(loop); }
+      loop();
+
+      // responsiveness
+      window.addEventListener('resize', ()=>{
+        cancelAnimationFrame(rafId);
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        canvas.width = w * DPR; canvas.height = h * DPR; canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; ctx.setTransform(DPR,0,0,DPR,0,0);
+      });
+
+      // reduce motion preference
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(mq.matches){ cancelAnimationFrame(rafId); /* static fallback: subtle gradient only */ }
+    })();
+
+    // mobile menu toggle
+    (function(){
+      const btn = document.querySelector('.hamburger');
+      const menu = document.querySelector('.nav-menu');
+      if(!btn || !menu) return;
+      btn.addEventListener('click',()=>{
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        if(menu.style.display === 'flex'){
+          menu.style.display = '';
+        } else {
+          menu.style.display = 'flex';
+          menu.style.flexDirection = 'column';
+        }
+      });
+    })();
+
+    // FAQ toggle
+    document.querySelectorAll('.faq-item').forEach(item=>{
+      const q = item.querySelector('.faq-question');
+      const a = item.querySelector('.faq-answer');
+      if(!q||!a) return;
+      q.addEventListener('click',()=>{
+        const isOpen = a.style.display === 'block';
+        a.style.display = isOpen ? 'none' : 'block';
+        const icon = q.querySelector('i');
+        if(icon){
+          icon.classList.toggle('fa-chevron-down', !isOpen);
+          icon.classList.toggle('fa-chevron-up', isOpen);
+        }
+      });
+    });
+
+    // SCROLL REVEAL (IntersectionObserver)
+    (function(){
+      const revealEls = document.querySelectorAll('.reveal');
+      if (!revealEls.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        // Fallback: show everything
+        revealEls.forEach(el => el.classList.add('show'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const delay = el.dataset.delay;
+            if (delay) {
+              el.style.transitionDelay = parseInt(delay, 10) + 'ms';
+            }
+            el.classList.add('show');
+            obs.unobserve(el);
+          }
+        });
+      }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      revealEls.forEach(el => observer.observe(el));
+    })();
+
+    // basic runtime logging
+    window.addEventListener('error', function(ev) { console.error('Runtime error:', ev.message); });
+    window.addEventListener('unhandledrejection', function(ev) { console.error('Unhandled promise rejection:', ev.reason); });
+  </script>
+</body>
+</html>

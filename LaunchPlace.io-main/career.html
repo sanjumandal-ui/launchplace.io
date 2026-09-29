@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Careers - LaunchPlace.io</title>
+
+  <!-- Icons & AOS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+
+  <style>
+    :root{
+      /* same palette family as homepage */
+      --primary:#7c3aed;             /* rich purple */
+      --primary-dark:#3b0b7a;        /* deep indigo */
+      --primary-light:#b47aff;       /* neon lavender */
+      --secondary:#ff4da6;           /* neon pink */
+      --accent:#d8b4fe;              /* soft lavender glow */
+      --text:#ffffff;
+      --text-light:#cfcfe0;
+      --background:#000000;          /* pure black base */
+      --background-alt:#0f0f12;      /* dark alt section bg */
+      --border:rgba(255,255,255,0.06);
+      --shadow:0 6px 18px rgba(3,7,18,0.7);
+      --shadow-lg:0 20px 50px rgba(0,0,0,0.9);
+      --max-width:1200px;
+      --gradient:linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+      --gradient-secondary:linear-gradient(135deg, var(--secondary), #e33da2);
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--background);
+      color:var(--text);
+      font-family:Inter,system-ui,Arial;
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    /* Canvas background */
+    #bgCanvas{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      mix-blend-mode:screen;
+      opacity:0.95;
+    }
+    .bg-gradient-overlay{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:radial-gradient(circle at 15% 0%, rgba(180,122,255,0.18), transparent 55%),
+                 radial-gradient(circle at 85% 100%, rgba(255,77,166,0.25), transparent 60%),
+                 linear-gradient(180deg, rgba(3,7,18,0.7), rgba(0,0,0,0.95));
+    }
+
+    .container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 20px;
+      position:relative;
+      z-index:5;
+    }
+
+    /* NAV (match homepage style) */
+    .navbar{
+      background:linear-gradient(90deg, #b47aff, #d7b9ff, #c491ff);
+      backdrop-filter: blur(12px);
+      box-shadow:0 2px 20px rgba(180,110,255,0.25);
+      position:fixed;
+      width:100%;
+      top:0;
+      z-index:1000;
+      transition:all 0.3s ease;
+    }
+    .navbar.scrolled{
+      background:linear-gradient(90deg, #c490ff, #e7d6ff);
+      box-shadow:0 5px 30px rgba(180,110,255,0.4);
+    }
+    .nav-container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      height:80px;
+    }
+    .logo a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:inherit;
+    }
+    .logo img{
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      display:block;
+      box-shadow:0 0 18px rgba(180,122,255,0.6);
+    }
+    .logo-text{
+      font-weight:800;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:#fff;
+      font-size:.92rem;
+    }
+
+    .nav-menu{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      list-style:none;
+      margin:0;
+      padding:0;
+      text-transform:uppercase;
+      font-size:.75rem;
+      letter-spacing:.12em;
+    }
+    .nav-link{
+      color:rgba(255,255,255,0.9);
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:600;
+      transition:.2s;
+    }
+    .nav-link:hover,
+    .nav-link.active{
+      background:rgba(0,0,0,0.15);
+      color:#fff;
+      box-shadow:0 0 14px rgba(148,163,255,0.5);
+    }
+    .nav-cta{
+      background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+      padding:8px 14px;
+      border-radius:999px;
+      color:white !important;
+      text-decoration:none;
+      font-weight:700;
+      box-shadow:0 0 22px rgba(180,122,255,0.65);
+      border:1px solid rgba(255,255,255,0.18);
+    }
+
+    .hamburger{
+      display:none;
+      flex-direction:column;
+      gap:6px;
+      width:34px;
+      cursor:pointer;
+    }
+    .hamburger span{
+      height:3px;
+      background:#fff;
+      display:block;
+      border-radius:3px;
+      opacity:0.9;
+      transition:.3s;
+    }
+    .hamburger.active span:nth-child(1){
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+    .hamburger.active span:nth-child(2){
+      opacity:0;
+    }
+    .hamburger.active span:nth-child(3){
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    /* dropdown menu (careers) */
+    .nav-item-dropdown{
+      position:relative;
+    }
+    .nav-item-dropdown .dropdown-menu{
+      display:none;
+      position:absolute;
+      top:120%;
+      left:0;
+      background:#050509;
+      border-radius:10px;
+      padding:.4rem;
+      box-shadow:var(--shadow-lg);
+      min-width:190px;
+      border:1px solid rgba(255,255,255,0.08);
+      z-index:1200;
+    }
+    .nav-item-dropdown .dropdown-item{
+      display:block;
+      padding:.5rem .85rem;
+      color:var(--text);
+      text-decoration:none;
+      font-size:.8rem;
+      border-radius:8px;
+      color:#e5e7eb;
+    }
+    .nav-item-dropdown .dropdown-item:hover{
+      background:rgba(180,122,255,0.18);
+      color:#fff;
+    }
+
+    /* Hero */
+    .careers-hero{
+      padding:160px 0 60px;
+      text-align:center;
+      background: radial-gradient(circle at 10% 0%, rgba(180,122,255,0.25), transparent 55%);
+    }
+    .careers-hero h2{
+      font-size:2.6rem;
+      margin:0 0 .5rem;
+      letter-spacing:-0.02em;
+    }
+    .careers-hero p{
+      color:rgba(255,255,255,0.9);
+      max-width:760px;
+      margin:0 auto;
+      font-size:1.05rem;
+    }
+
+    /* Careers layout */
+    .careers-section{
+      padding:40px 0 80px;
+      background:transparent;
+    }
+    .careers-tabs{
+      display:flex;
+      justify-content:center;
+      margin-bottom:2rem;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      gap:.5rem;
+    }
+    .career-tab{
+      padding:12px 18px;
+      background:none;
+      border:none;
+      font-size:1.05rem;
+      font-weight:600;
+      color:rgba(255,255,255,0.75);
+      cursor:pointer;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      position:relative;
+    }
+    .career-tab.active{
+      color:var(--primary-light);
+    }
+    .career-tab.active::after{
+      content:'';
+      display:block;
+      height:3px;
+      background:linear-gradient(90deg,var(--secondary),var(--primary-light));
+      border-radius:3px;
+      margin-top:10px;
+    }
+
+    .careers-content{
+      max-width:1100px;
+      margin:0 auto;
+      display:none;
+    }
+    .careers-content.active{
+      display:block;
+    }
+
+    .job-listings{
+      display:grid;
+      gap:1.25rem;
+    }
+    .job-card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3));
+      padding:1.5rem;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      border-left:4px solid var(--primary-light);
+      border-top:1px solid rgba(255,255,255,0.06);
+      backdrop-filter:blur(10px);
+    }
+    .job-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:.75rem;
+      gap:1rem;
+    }
+    .job-title{
+      font-size:1.15rem;
+      font-weight:700;
+      margin:0;
+      color:#fff;
+    }
+    .job-meta{
+      display:flex;
+      gap:.5rem;
+      flex-wrap:wrap;
+    }
+    .job-tag{
+      background:rgba(255,255,255,0.06);
+      padding:.3rem .6rem;
+      border-radius:999px;
+      font-size:.8rem;
+      color:rgba(255,255,255,0.9);
+    }
+
+    .job-description{
+      color:rgba(255,255,255,0.85);
+      margin-bottom:.75rem;
+      font-size:.95rem;
+    }
+    .job-requirements h4{
+      margin:0 0 .5rem;
+      color:#fff;
+    }
+    .job-requirements ul{
+      list-style:none;
+      padding-left:0;
+      margin:0;
+    }
+    .job-requirements li{
+      padding:.25rem 0;
+      color:rgba(255,255,255,0.8);
+      display:flex;
+      align-items:flex-start;
+      gap:.5rem;
+      font-size:.9rem;
+    }
+    .job-requirements li::before{
+      content:'•';
+      color:var(--primary-light);
+      margin-right:.5rem;
+    }
+
+    .apply-btn{
+      background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+      color:#fff;
+      border:none;
+      padding:.7rem 1.1rem;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:.85rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      box-shadow:0 0 20px rgba(180,122,255,0.6);
+    }
+
+    /* Modal (application) */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.7);
+      z-index:4000;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .modal-content{
+      background:#050509;
+      color:#f9fafb;
+      border-radius:16px;
+      max-width:760px;
+      width:100%;
+      max-height:90vh;
+      overflow:auto;
+      position:relative;
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:var(--shadow-lg);
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:1.25rem 1.5rem;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .close-modal{
+      background:none;
+      border:none;
+      font-size:1.4rem;
+      cursor:pointer;
+      color:rgba(249,250,251,0.7);
+    }
+
+    /* form / contact card style */
+    .form-label{
+      display:block;
+      margin-bottom:.35rem;
+      font-weight:600;
+      color:#e5e7eb;
+      font-size:.9rem;
+    }
+    .form-control{
+      width:100%;
+      padding:.85rem;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.16);
+      background:rgba(15,23,42,0.9);
+      color:#f9fafb;
+      font-size:.9rem;
+    }
+    .form-control:focus{
+      outline:none;
+      box-shadow:0 0 0 3px rgba(180,122,255,0.4);
+      border-color:var(--primary-light);
+    }
+
+    /* footer */
+    footer{
+      padding:32px 0 0;
+      margin-top:24px;
+      position:relative;
+      z-index:5;
+      background:rgba(0,0,0,0.9);
+      border-top:1px solid rgba(255,255,255,0.06);
+    }
+    .footer-content{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      gap:12px;
+    }
+    .footer-section h3{
+      margin:0 0 .75rem;
+      color:rgba(255,255,255,0.95);
+      font-size:1rem;
+    }
+    .footer-bottom{
+      text-align:center;
+      color:rgba(255,255,255,0.55);
+      margin-top:14px;
+      padding:10px 0 16px;
+      font-size:.85rem;
+    }
+
+    /* responsive */
+    @media (max-width:1000px){
+      .careers-hero h2{font-size:2.2rem}
+      .footer-content{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:800px){
+      .nav-menu{
+        display:none;
+        position:fixed;
+        top:80px;
+        right:0;
+        left:0;
+        background:rgba(3,7,18,0.98);
+        padding:16px 20px 20px;
+        border-radius:0 0 18px 18px;
+        box-shadow:0 18px 40px rgba(0,0,0,0.95);
+        flex-direction:column;
+        width:100%;
+      }
+      .nav-menu.active{
+        display:flex;
+      }
+      .hamburger{display:flex}
+      .careers-hero{padding:140px 0 40px}
+      .job-meta{gap:.35rem}
+      .job-card{padding:1.1rem}
+    }
+    @media (max-width:640px){
+      .footer-content{grid-template-columns:1fr}
+    }
+
+    /* small helpers for footer links */
+    footer a{
+      color:rgba(255,255,255,0.85);
+      text-decoration:none;
+      font-size:.9rem;
+    }
+    footer a:hover{
+      color:var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas background + overlay -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="bg-gradient-overlay" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="index.html" aria-label="LaunchPlace home">
+          <img src="logo.svg" alt="LaunchPlace logo" width="44" height="44" onerror="this.style.display='none'">
+          <span class="logo-text">LAUNCHPLACE.IO</span>
+        </a>
+      </div>
+
+      <ul class="nav-menu" role="menubar">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+        <li class="nav-item-dropdown">
+          <a href="#" class="nav-link">Careers <i class="fas fa-chevron-down" style="font-size:.8rem;margin-left:.3rem"></i></a>
+          <div class="dropdown-menu">
+            <a href="#careers" class="dropdown-item"><i class="fas fa-briefcase" style="margin-right:.6rem"></i> Careers</a>
+            <a href="#internships" class="dropdown-item"><i class="fas fa-graduation-cap" style="margin-right:.6rem"></i> Internships</a>
+          </div>
+        </li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="contact.html#contact-form" class="nav-cta">Get Started</a></li>
+      </ul>
+
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="careers-hero" aria-labelledby="careers-heading">
+    <div class="container">
+      <h2 id="careers-heading">Join Our Team</h2>
+      <p>We're always looking for talented individuals to join our growing team. Explore our current openings below.</p>
+    </div>
+  </section>
+
+  <!-- Careers Section -->
+  <section class="careers-section" id="careers-section">
+    <div class="container">
+      <div class="careers-tabs" role="tablist" aria-label="Careers tabs">
+        <button class="career-tab active" data-tab="careers">Careers</button>
+        <button class="career-tab" data-tab="internships">Internships</button>
+      </div>
+
+      <!-- Careers Tab Content -->
+      <div class="careers-content active" id="careers-tab">
+        <div class="job-listings">
+          <div class="job-card" data-aos="fade-up">
+            <div class="job-header">
+              <div>
+                <h3 class="job-title">Frontend Developer</h3>
+                <div class="job-meta">
+                  <span class="job-tag"><i class="fas fa-map-marker-alt"></i> Remote</span>
+                  <span class="job-tag"><i class="fas fa-clock"></i> Full-time</span>
+                  <span class="job-tag"><i class="fas fa-money-bill-wave"></i> ₹6-10 LPA</span>
+                </div>
+              </div>
+              <div>
+                <button class="apply-btn" data-job="Frontend Developer">Apply Now <i class="fas fa-paper-plane" style="margin-left:.6rem"></i></button>
+              </div>
+            </div>
+            <p class="job-description">We're looking for a skilled Frontend Developer to join our team and help build beautiful, responsive websites for our clients.</p>
+            <div class="job-requirements">
+              <h4>Requirements:</h4>
+              <ul>
+                <li>2+ years of experience in frontend development</li>
+                <li>Proficiency in HTML, CSS, JavaScript</li>
+                <li>Experience with React.js or Vue.js</li>
+                <li>Knowledge of responsive design principles</li>
+                <li>Good understanding of UI/UX principles</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="job-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="job-header">
+              <div>
+                <h3 class="job-title">UI/UX Designer</h3>
+                <div class="job-meta">
+                  <span class="job-tag"><i class="fas fa-map-marker-alt"></i> Remote</span>
+                  <span class="job-tag"><i class="fas fa-clock"></i> Full-time</span>
+                  <span class="job-tag"><i class="fas fa-money-bill-wave"></i> ₹5-8 LPA</span>
+                </div>
+              </div>
+              <div>
+                <button class="apply-btn" data-job="UI/UX Designer">Apply Now <i class="fas fa-paper-plane" style="margin-left:.6rem"></i></button>
+              </div>
+            </div>
+            <p class="job-description">Join our design team to create stunning user interfaces and experiences for our diverse client base.</p>
+            <div class="job-requirements">
+              <h4>Requirements:</h4>
+              <ul>
+                <li>1+ years of experience in UI/UX design</li>
+                <li>Proficiency in Figma, Adobe XD, or Sketch</li>
+                <li>Strong portfolio showcasing design projects</li>
+                <li>Understanding of user-centered design principles</li>
+                <li>Ability to create wireframes and prototypes</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Internships Tab Content -->
+      <div class="careers-content" id="internships-tab">
+        <div class="job-listings">
+          <div class="job-card" data-aos="fade-up">
+            <div class="job-header">
+              <div>
+                <h3 class="job-title">Web Development Intern</h3>
+                <div class="job-meta">
+                  <span class="job-tag"><i class="fas fa-map-marker-alt"></i> Remote</span>
+                  <span class="job-tag"><i class="fas fa-clock"></i> 3-6 months</span>
+                  <span class="job-tag"><i class="fas fa-money-bill-wave"></i> Stipend Provided</span>
+                </div>
+              </div>
+              <div>
+                <button class="apply-btn" data-job="Web Development Intern">Apply Now <i class="fas fa-paper-plane" style="margin-left:.6rem"></i></button>
+              </div>
+            </div>
+            <p class="job-description">Perfect opportunity for students or recent graduates to gain hands-on experience in web development working on real client projects.</p>
+            <div class="job-requirements">
+              <h4>What You'll Learn:</h4>
+              <ul>
+                <li>Frontend development with HTML, CSS, JavaScript</li>
+                <li>Responsive web design techniques</li>
+                <li>Working with modern frameworks and libraries</li>
+                <li>Client communication and project management</li>
+                <li>Version control with Git</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="job-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="job-header">
+              <div>
+                <h3 class="job-title">Digital Marketing Intern</h3>
+                <div class="job-meta">
+                  <span class="job-tag"><i class="fas fa-map-marker-alt"></i> Remote</span>
+                  <span class="job-tag"><i class="fas fa-clock"></i> 3-6 months</span>
+                  <span class="job-tag"><i class="fas fa-money-bill-wave"></i> Stipend Provided</span>
+                </div>
+              </div>
+              <div>
+                <button class="apply-btn" data-job="Digital Marketing Intern">Apply Now <i class="fas fa-paper-plane" style="margin-left:.6rem"></i></button>
+              </div>
+            </div>
+            <p class="job-description">Learn the ins and outs of digital marketing while helping promote our services and client websites.</p>
+            <div class="job-requirements">
+              <h4>What You'll Learn:</h4>
+              <ul>
+                <li>SEO strategies and implementation</li>
+                <li>Social media marketing and management</li>
+                <li>Content creation and marketing</li>
+                <li>Email marketing campaigns</li>
+                <li>Analytics and performance tracking</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Application Modal -->
+  <div id="application-modal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <div class="modal-header">
+        <h3 id="app-modal-title" style="margin:0;color:var(--primary-light)">Apply for <span id="job-title">Role</span></h3>
+        <button class="close-modal" aria-label="Close">&times;</button>
+      </div>
+      <div style="padding:1rem 1.5rem 2rem">
+        <form id="application-form">
+          <div style="display:grid;gap:.75rem">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+              <div><label class="form-label">First Name</label><input class="form-control" id="app-firstName" required></div>
+              <div><label class="form-label">Last Name</label><input class="form-control" id="app-lastName" required></div>
+            </div>
+            <div><label class="form-label">Email</label><input class="form-control" id="app-email" type="email" required></div>
+            <div><label class="form-label">Phone</label><input class="form-control" id="app-phone" type="tel" required></div>
+            <div><label class="form-label">Upload Resume</label><input class="form-control" id="app-resume" type="file" accept=".pdf,.doc,.docx" required></div>
+            <div><label class="form-label">Cover Letter</label><textarea class="form-control" id="app-cover" rows="5"></textarea></div>
+            <div style="text-align:right"><button type="submit" class="apply-btn">Submit Application <i class="fas fa-paper-plane" style="margin-left:.5rem"></i></button></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="logo">
+            <a href="index.html" aria-label="LaunchPlace home" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+              <img src="logo.svg" alt="LaunchPlace logo" width="40" height="40" onerror="this.style.display='none'">
+              <span class="logo-text">LAUNCHPLACE.IO</span>
+            </a>
+          </div>
+          <p style="color:rgba(255,255,255,0.85)">Professional websites for small businesses. Fast, affordable, and effective.</p>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="#careers">Careers</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Services</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><a href="#">Website Development</a></li>
+            <li><a href="#">E-commerce Stores</a></li>
+            <li><a href="#">Website Redesign</a></li>
+            <li><a href="#">SEO Optimization</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><i class="fas fa-envelope"></i> launchplaceio@gmail.com</li>
+            <li><i class="fas fa-phone"></i> +91 79759 40152</li>
+            <li><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year"></span> LaunchPlace.io. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts: AOS + interactions + particle bg -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    // set year
+    (function(){ try{ document.getElementById('current-year').textContent = new Date().getFullYear(); }catch(e){} })();
+
+    // init AOS
+    AOS.init({duration:800,once:true});
+
+    // PARTICLE BACKGROUND (Canvas) - tuned to lavender / pink
+    (function(){
+      const canvas = document.getElementById('bgCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d',{alpha:true});
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+      const DPR = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = w * DPR; canvas.height = h * DPR; canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; ctx.scale(DPR,DPR);
+
+      const colors = [
+        'rgba(180,122,255,0.32)',   // lavender
+        'rgba(255,77,166,0.30)',    // neon pink
+        'rgba(124,58,237,0.28)'     // purple
+      ];
+      function rand(min,max){return Math.random()*(max-min)+min}
+
+      const particleCount = Math.min(130, Math.floor((w*h)/8000));
+      const particles = [];
+      function Particle(){
+        this.x = rand(0,w); this.y = rand(0,h);
+        this.r = rand(1.2,6);
+        this.vx = rand(-0.25,0.6);
+        this.vy = rand(-0.25,0.6);
+        this.color = colors[Math.floor(Math.random()*colors.length)];
+        this.alpha = rand(0.18,0.85);
+      }
+      for(let i=0;i<particleCount;i++) particles.push(new Particle());
+
+      function draw(){
+        ctx.clearRect(0,0,w,h);
+        const gradient = ctx.createRadialGradient(w*0.15,h*0.12,0,w*0.7,h*0.8,Math.max(w,h));
+        gradient.addColorStop(0,'rgba(180,122,255,0.12)');
+        gradient.addColorStop(1,'rgba(0,0,0,0.9)');
+        ctx.fillStyle = gradient; ctx.fillRect(0,0,w,h);
+
+        for(let p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -30) p.x = w + 30; if(p.x > w+30) p.x = -30;
+          if(p.y < -30) p.y = h + 30; if(p.y > h+30) p.y = -30;
+
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.globalAlpha = p.alpha * 0.35;
+          ctx.arc(p.x,p.y,p.r*3.4,0,Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // connecting lines
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx = a.x-b.x, dy = a.y-b.y; const d = Math.sqrt(dx*dx+dy*dy);
+            if(d < 120){
+              ctx.beginPath();
+              const alpha = 0.05 * (1 - d/120);
+              ctx.strokeStyle = 'rgba(212,196,255,'+alpha+')';
+              ctx.lineWidth = 1;
+              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }
+        }
+      }
+
+      let raf;
+      function loop(){ draw(); raf = requestAnimationFrame(loop); }
+      loop();
+
+      window.addEventListener('resize', ()=> {
+        cancelAnimationFrame(raf);
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        canvas.width = w * DPR; canvas.height = h * DPR; canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+        loop();
+      });
+
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(mq.matches){ cancelAnimationFrame(raf); }
+    })();
+
+    // mobile nav toggle
+    (function(){
+      const btn = document.querySelector('.hamburger');
+      const menu = document.querySelector('.nav-menu');
+      if(!btn || !menu) return;
+      btn.addEventListener('click', ()=> {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        btn.classList.toggle('active');
+        menu.classList.toggle('active');
+      });
+    })();
+
+    // navbar scroll effect (add .scrolled)
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('.navbar');
+      if (!nav) return;
+      if (window.scrollY > 10) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+
+    /* ---------------------------
+       Robust careers tab handler
+       --------------------------- */
+    (function(){
+      const tabButtons = Array.from(document.querySelectorAll('.career-tab'));
+      const contents = Array.from(document.querySelectorAll('.careers-content'));
+
+      function getContentId(tabName){
+        if(!tabName) return null;
+        const normalized = tabName.replace(/^-+|-+$/g,'');
+        const base = normalized.replace(/-section$/,'').replace(/-tab$/,'');
+        const candidates = [
+          `${base}-tab`,
+          base,
+          `${base}-section`,
+          `${base}-content`
+        ];
+        for(const id of candidates){
+          if(document.getElementById(id)) return id;
+        }
+        const section = document.getElementById(tabName);
+        if(section){
+          const nested = section.querySelector('.careers-content');
+          if(nested && nested.id) return nested.id;
+        }
+        return null;
+      }
+
+      function openTab(tabName, opts = {}) {
+        if(!tabName) return false;
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabButtons.forEach(btn => {
+          if(btn.dataset.tab === tabName) btn.classList.add('active');
+        });
+        contents.forEach(c => c.classList.remove('active'));
+
+        const contentId = getContentId(tabName);
+        if(contentId){
+          const el = document.getElementById(contentId);
+          if(el){
+            el.classList.add('active');
+            if(opts.scroll !== false) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+            el.setAttribute('tabindex','-1');
+            try{ el.focus({preventScroll:true}); }catch(e){}
+          }
+          return true;
+        }
+
+        const fallback = document.querySelectorAll(`.careers-content[data-tab="${tabName}"]`);
+        if(fallback.length){
+          fallback.forEach(f => f.classList.add('active'));
+          if(opts.scroll !== false) fallback[0].scrollIntoView({behavior:'smooth', block:'start'});
+          fallback[0].setAttribute('tabindex','-1'); fallback[0].focus({preventScroll:true});
+          return true;
+        }
+
+        console.warn('Careers tab content not found for', tabName);
+        return false;
+      }
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', function(){
+          const tabName = btn.dataset.tab;
+          openTab(tabName);
+          if(history && history.replaceState){
+            try { history.replaceState(null, '', '#' + tabName); } catch(e){}
+          } else { location.hash = '#'+tabName; }
+        });
+
+        btn.addEventListener('keydown', function(e){
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            btn.click();
+          }
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', function(){
+        const hash = (location.hash || '').replace('#','');
+        if(hash){
+          const opened = openTab(hash, {scroll:false});
+          if(opened) return;
+        }
+        const activeBtn = tabButtons.find(b => b.classList.contains('active')) || tabButtons[0];
+        if(activeBtn) openTab(activeBtn.dataset.tab, {scroll:false});
+      });
+
+      // support external anchor links opening tabs
+      document.addEventListener('click', function(e){
+        const a = e.target.closest('a[href^="#"]');
+        if(!a) return;
+        const targetHash = a.getAttribute('href').slice(1);
+        if(!targetHash) return;
+        const contentId = getContentId(targetHash);
+        if(contentId || document.querySelector(`.careers-content[data-tab="${targetHash}"]`)){
+          e.preventDefault();
+          openTab(targetHash);
+          if(history && history.pushState){
+            try { history.pushState(null, '', '#' + targetHash); } catch(e){}
+          } else { location.hash = '#'+targetHash; }
+        }
+      });
+    })();
+
+    // application modal open/close and form
+    (function(){
+      // open when apply buttons clicked
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('.apply-btn');
+        if(btn && btn.dataset.job){
+          const title = btn.dataset.job;
+          document.getElementById('job-title').textContent = title;
+          const modal = document.getElementById('application-modal');
+          if(modal){ modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; }
+        }
+      });
+
+      // close modal X and outside clicks
+      document.addEventListener('click', function(e){
+        if(e.target.matches('.close-modal')) {
+          const modal = e.target.closest('.modal');
+          if(modal){ modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); document.body.style.overflow = 'auto'; }
+        }
+        if(e.target.classList && e.target.classList.contains('modal')) {
+          e.target.style.display = 'none'; e.target.setAttribute('aria-hidden','true'); document.body.style.overflow = 'auto';
+        }
+      });
+
+      // escape key
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+          document.querySelectorAll('.modal').forEach(m=>{ m.style.display='none'; m.setAttribute('aria-hidden','true'); });
+          document.body.style.overflow = 'auto';
+        }
+      });
+
+      // application form submit (simulate)
+      document.addEventListener('submit', function(e){
+        if(e.target && e.target.id === 'application-form'){
+          e.preventDefault();
+          const btn = e.target.querySelector('.apply-btn');
+          const original = btn.innerHTML;
+          btn.innerHTML = 'Submitting... <i class="fas fa-spinner fa-spin"></i>';
+          btn.disabled = true;
+          setTimeout(()=> {
+            alert('Application submitted — thanks! We will review and get back to you.');
+            document.getElementById('application-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            e.target.reset();
+            btn.innerHTML = original; btn.disabled = false;
+          }, 1400);
+        }
+      });
+    })();
+
+    // career dropdown (mobile/desktop)
+    (function(){
+      const careerDropdown = document.querySelector('.nav-item-dropdown');
+      if(careerDropdown){
+        const trigger = careerDropdown.querySelector('.nav-link');
+        const menu = careerDropdown.querySelector('.dropdown-menu');
+
+        // desktop: hover
+        careerDropdown.addEventListener('mouseenter', () => {
+          if(window.innerWidth >= 800 && menu){ menu.style.display = 'block'; }
+        });
+        careerDropdown.addEventListener('mouseleave', () => {
+          if(window.innerWidth >= 800 && menu){ menu.style.display = 'none'; }
+        });
+
+        // mobile: tap
+        trigger.addEventListener('click', (e)=> {
+          if(window.innerWidth < 800){
+            e.preventDefault();
+            if(menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

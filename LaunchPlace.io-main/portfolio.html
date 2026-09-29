@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Our Portfolio - LaunchPlace.io</title>
+
+    <!-- Icons & AOS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+
+    <style>
+      /* --- design vars - unified with other pages --- */
+      :root{
+        --primary:#7c3aed;             /* rich purple */
+        --primary-dark:#3b0b7a;        /* deep indigo */
+        --primary-light:#b47aff;       /* neon lavender */
+        --secondary:#ff4da6;           /* neon pink */
+        --accent:#d8b4fe;              /* soft lavender glow */
+        --text:#ffffff;
+        --text-light:#cfcfe0;
+        --background:#000000;          /* pure black base */
+        --background-alt:#0f0f12;
+        --border: rgba(255,255,255,0.06);
+        --shadow: 0 6px 18px rgba(0,0,0,0.7);
+        --shadow-lg: 0 20px 50px rgba(0,0,0,0.9);
+        --max-width:1200px;
+      }
+
+      html,body{
+        height:100%;
+        margin:0;
+        background:var(--background);
+        color:var(--text);
+        font-family:Inter,system-ui,Arial;
+        overflow-x:hidden;
+        scroll-behavior:smooth;
+      }
+
+      /* Canvas / overlay */
+      #bgCanvas{
+        position:fixed;
+        inset:0;
+        z-index:0;
+        pointer-events:none;
+        mix-blend-mode:screen;
+        opacity:0.95;
+      }
+      .bg-gradient-overlay{
+        position:fixed;
+        inset:0;
+        z-index:1;
+        pointer-events:none;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(180,122,255,0.22), transparent 55%),
+          radial-gradient(circle at 90% 100%, rgba(255,77,166,0.25), transparent 60%),
+          linear-gradient(180deg, rgba(3,7,18,0.8), rgba(0,0,0,0.98));
+      }
+
+      /* Container */
+      .container{
+        max-width:var(--max-width);
+        margin:0 auto;
+        padding:0 20px;
+        position:relative;
+        z-index:5;
+      }
+
+      /* NAV - same look as contact/careers */
+      .navbar{
+        background:linear-gradient(90deg, #b47aff, #d7b9ff, #c491ff);
+        backdrop-filter: blur(12px);
+        box-shadow:0 2px 20px rgba(180,110,255,0.25);
+        position:fixed;
+        width:100%;
+        top:0;
+        z-index:1000;
+        transition:all 0.3s ease;
+      }
+      .navbar.scrolled{
+        background:linear-gradient(90deg, #c490ff, #e7d6ff);
+        box-shadow:0 5px 30px rgba(180,110,255,0.4);
+      }
+      .nav-container{
+        max-width:var(--max-width);
+        margin:0 auto;
+        padding:0 20px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:20px;
+        height:80px;
+      }
+      .logo a{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        text-decoration:none;
+        color:inherit;
+      }
+      .logo img{
+        width:44px;
+        height:44px;
+        border-radius:10px;
+        display:block;
+        box-shadow:0 0 18px rgba(180,122,255,0.7);
+      }
+      .logo-text{
+        font-weight:800;
+        letter-spacing:0.18em;
+        text-transform:uppercase;
+        color:#fff;
+        font-size:.92rem;
+      }
+
+      .nav-menu{
+        display:flex;
+        gap:14px;
+        align-items:center;
+        list-style:none;
+        margin:0;
+        padding:0;
+        text-transform:uppercase;
+        font-size:.75rem;
+        letter-spacing:.12em;
+      }
+      .nav-link{
+        color:rgba(255,255,255,0.9);
+        text-decoration:none;
+        padding:8px 10px;
+        border-radius:999px;
+        font-weight:600;
+        transition:.2s;
+      }
+      .nav-link:hover,
+      .nav-link.active{
+        background:rgba(0,0,0,0.18);
+        color:#fff;
+        box-shadow:0 0 14px rgba(148,163,255,0.5);
+      }
+      .nav-cta{
+        background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+        padding:8px 14px;
+        border-radius:999px;
+        color:white !important;
+        text-decoration:none;
+        font-weight:700;
+        box-shadow:0 0 22px rgba(180,122,255,0.65);
+        border:1px solid rgba(255,255,255,0.18);
+      }
+
+      .hamburger{
+        display:none;
+        flex-direction:column;
+        gap:6px;
+        width:34px;
+        cursor:pointer;
+      }
+      .hamburger span{
+        height:3px;
+        background:#fff;
+        display:block;
+        border-radius:3px;
+        opacity:0.9;
+        transition:.3s;
+      }
+      .hamburger.active span:nth-child(1){
+        transform: rotate(-45deg) translate(-5px, 6px);
+      }
+      .hamburger.active span:nth-child(2){
+        opacity:0;
+      }
+      .hamburger.active span:nth-child(3){
+        transform: rotate(45deg) translate(-5px, -6px);
+      }
+
+      /* Hero */
+      .portfolio-hero{
+        background:transparent;
+        color:white;
+        padding:160px 0 100px;
+        margin-top:0;
+        text-align:center;
+        position:relative;
+        overflow:hidden;
+      }
+      .portfolio-hero h1{
+        font-size:3rem;
+        margin:0 0 1rem;
+        letter-spacing:-0.02em;
+      }
+      .portfolio-hero p{
+        font-size:1.1rem;
+        color:rgba(255,255,255,0.85);
+        max-width:760px;
+        margin:0 auto;
+      }
+
+      /* Filters */
+      .portfolio-section{
+        padding-bottom:60px;
+      }
+      .portfolio-filters{
+        display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:1rem;
+        margin:40px 0 3rem;
+        padding:0 1rem;
+      }
+      .filter-btn{
+        background:rgba(0,0,0,0.7);
+        border:1px solid rgba(255,255,255,0.18);
+        padding:0.75rem 1.25rem;
+        border-radius:50px;
+        font-weight:600;
+        cursor:pointer;
+        color:var(--text-light);
+        font-size:.85rem;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        transition:.25s;
+      }
+      .filter-btn.active,
+      .filter-btn:hover{
+        background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+        color:#fff;
+        border-color:transparent;
+        box-shadow:0 0 18px rgba(180,122,255,0.7);
+        transform:translateY(-2px);
+      }
+
+      /* Grid */
+      .portfolio-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+        gap:2rem;
+        margin-bottom:4rem;
+      }
+      .portfolio-item{
+        background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
+        border-radius:16px;
+        overflow:hidden;
+        box-shadow:var(--shadow);
+        position:relative;
+        transition:transform .28s,box-shadow .28s,opacity .28s;
+        opacity:1;
+        transform:scale(1);
+        border:1px solid rgba(255,255,255,0.08);
+        backdrop-filter:blur(18px);
+      }
+      .portfolio-item:hover{
+        transform:translateY(-6px);
+        box-shadow:var(--shadow-lg);
+        border-color:rgba(180,122,255,0.7);
+      }
+      .portfolio-item.hidden{
+        opacity:0;
+        transform:scale(.96);
+        pointer-events:none;
+      }
+
+      .portfolio-image{
+        height:250px;
+        background:linear-gradient(45deg,var(--primary-light),var(--primary));
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:white;
+        font-weight:700;
+        position:relative;
+        font-size:1.25rem;
+        text-transform:uppercase;
+        letter-spacing:.12em;
+      }
+      .portfolio-image::before{
+        content:'';
+        position:absolute;
+        inset:0;
+        background:radial-gradient(circle at 10% 0%,rgba(0,0,0,0.0),rgba(0,0,0,0.45));
+        transition:opacity .3s;
+        opacity:0;
+      }
+      .portfolio-item:hover .portfolio-image::before{
+        opacity:1;
+      }
+      .portfolio-overlay{
+        position:absolute;
+        inset:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        opacity:0;
+        transition:opacity .28s;
+        background:rgba(2,6,23,0.7);
+      }
+      .portfolio-item:hover .portfolio-overlay{
+        opacity:1;
+      }
+      .view-project{
+        background:#fff;
+        color:var(--primary);
+        padding:.75rem 1.25rem;
+        border-radius:50px;
+        text-decoration:none;
+        font-weight:700;
+        display:inline-block;
+        transform:translateY(12px);
+        transition:transform .3s, box-shadow .3s;
+        box-shadow:0 12px 30px rgba(15,23,42,0.7);
+      }
+      .portfolio-item:hover .view-project{
+        transform:translateY(0);
+        box-shadow:0 0 18px rgba(255,255,255,0.4);
+      }
+
+      .portfolio-content{
+        padding:1.25rem 1.25rem 1.4rem;
+      }
+      .portfolio-content h3{
+        margin:0 0 .5rem;
+        color: #fff;
+        font-size:1.1rem;
+      }
+      .portfolio-content p{
+        color:rgba(255,255,255,0.78);
+        margin:0 0 1rem;
+        line-height:1.6;
+        font-size:.95rem;
+      }
+      .portfolio-tags{
+        display:flex;
+        gap:.5rem;
+        flex-wrap:wrap;
+        margin-bottom:.75rem;
+      }
+      .portfolio-tag{
+        background:rgba(255,255,255,0.04);
+        padding:.3rem .6rem;
+        border-radius:12px;
+        font-size:.8rem;
+        color:rgba(255,255,255,0.9);
+        border:1px solid rgba(255,255,255,0.12);
+      }
+      .package-tag{
+        background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+        color:#fff;
+        padding:.3rem .6rem;
+        border-radius:12px;
+        font-size:.8rem;
+        font-weight:600;
+        display:inline-block;
+        box-shadow:0 0 14px rgba(180,122,255,0.7);
+      }
+
+      /* Stats/testimonials/cta */
+      .portfolio-stats{
+        padding:20px 0 80px;
+        background:transparent;
+      }
+      .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+        gap:1.25rem;
+      }
+      .stat-item{
+        background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
+        padding:2rem;
+        border-radius:12px;
+        box-shadow:var(--shadow);
+        text-align:center;
+        border:1px solid rgba(255,255,255,0.08);
+        backdrop-filter:blur(18px);
+      }
+      .stat-number{
+        font-size:2rem;
+        font-weight:800;
+        color:var(--primary-light);
+        margin-bottom:.5rem;
+      }
+      .stat-label{
+        color:rgba(255,255,255,0.9);
+        font-weight:700;
+        font-size:.95rem;
+      }
+
+      .testimonials{
+        padding:40px 0 80px;
+      }
+      .testimonial-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:1.25rem;
+      }
+      .testimonial-card{
+        background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
+        padding:1.5rem;
+        border-radius:12px;
+        box-shadow:var(--shadow);
+        position:relative;
+        border:1px solid rgba(255,255,255,0.1);
+        backdrop-filter:blur(18px);
+      }
+      .testimonial-card::before{
+        content:'\"';
+        position:absolute;
+        top:4px;
+        left:10px;
+        font-size:3rem;
+        color:rgba(139,92,246,0.18);
+        opacity:0.9;
+        font-family:Georgia,serif;
+      }
+      .testimonial-text{
+        font-style:italic;
+        color:rgba(255,255,255,0.93);
+        margin-bottom:1rem;
+        font-size:.95rem;
+      }
+      .author-avatar{
+        width:48px;
+        height:48px;
+        border-radius:50%;
+        background:linear-gradient(135deg,var(--secondary),var(--primary-light));
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#fff;
+        font-weight:700;
+        box-shadow:0 0 16px rgba(180,122,255,0.7);
+      }
+
+      /* modal */
+      .project-modal{
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.85);
+        z-index:4000;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+      }
+      .modal-content{
+        background:#ffffff;
+        color:#111827;
+        border-radius:14px;
+        width:100%;
+        max-width:960px;
+        max-height:90vh;
+        overflow:auto;
+        position:relative;
+        box-shadow:0 30px 80px rgba(0,0,0,0.75);
+      }
+      .close-modal{
+        position:absolute;
+        top:14px;
+        right:14px;
+        background:rgba(0,0,0,0.7);
+        color:#fff;
+        border:none;
+        width:40px;
+        height:40px;
+        border-radius:50%;
+        font-size:1.2rem;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      }
+
+      .modal-image{
+        height:300px;
+        background:linear-gradient(45deg,var(--primary-light),var(--primary));
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#fff;
+        font-size:2rem;
+        font-weight:700;
+        text-transform:uppercase;
+        letter-spacing:.12em;
+      }
+      .modal-body{
+        padding:1.5rem 1.6rem 1.8rem;
+      }
+      .project-details{
+        display:grid;
+        grid-template-columns:2fr 1fr;
+        gap:1.25rem;
+      }
+      .project-details h3{
+        margin-top:.2rem;
+      }
+      .features-list{
+        list-style:none;
+      }
+      .features-list li{
+        padding:.25rem 0;
+        font-size:.93rem;
+      }
+      .features-list li::before{
+        content:'✓';
+        color:var(--primary);
+        margin-right:.5rem;
+      }
+
+      /* CTA */
+      .cta{
+        background:linear-gradient(180deg, rgba(124,58,237,0.95), rgba(255,77,166,0.92));
+      }
+
+      /* footer */
+      footer{
+        padding:24px 0 0;
+        margin-top:0;
+        position:relative;
+        z-index:5;
+        background:rgba(0,0,0,0.96);
+        border-top:1px solid rgba(255,255,255,0.06);
+      }
+      .footer-content{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr 1fr;
+        gap:12px;
+      }
+      .footer-section h3{
+        margin:0 0 .75rem;
+        color:rgba(255,255,255,0.95);
+      }
+      footer a{
+        color:rgba(255,255,255,0.9);
+        text-decoration:none;
+        font-size:.9rem;
+      }
+      footer a:hover{
+        color:var(--accent);
+      }
+      .footer-bottom{
+        text-align:center;
+        color:rgba(255,255,255,0.55);
+        margin-top:14px;
+        padding:10px 0 16px;
+        font-size:.85rem;
+      }
+
+      /* responsiveness */
+      @media (max-width:1000px){
+        .portfolio-hero h1{font-size:2.4rem}
+        .testimonial-grid{grid-template-columns:1fr}
+        .footer-content{grid-template-columns:1fr 1fr}
+      }
+      @media (max-width:800px){
+        .nav-menu{
+          display:none;
+          position:fixed;
+          top:80px;
+          right:0;
+          left:0;
+          background:rgba(3,7,18,0.98);
+          padding:16px 20px 20px;
+          border-radius:0 0 18px 18px;
+          box-shadow:0 18px 40px rgba(0,0,0,0.95);
+          flex-direction:column;
+          width:100%;
+        }
+        .nav-menu.active{
+          display:flex;
+        }
+        .hamburger{display:flex}
+      }
+      @media (max-width:640px){
+        .portfolio-grid{grid-template-columns:1fr}
+        .project-details{grid-template-columns:1fr}
+        .portfolio-hero{padding:140px 0 80px}
+      }
+      @media (max-width:900px){
+        .footer-content{grid-template-columns:1fr 1fr;}
+      }
+      @media (max-width:600px){
+        .footer-content{grid-template-columns:1fr;}
+      }
+    </style>
+</head>
+<body>
+  <!-- Animated background canvas + overlay -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="bg-gradient-overlay" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="index.html" aria-label="LaunchPlace home">
+          <img src="logo.svg" alt="LaunchPlace logo" width="44" height="44" onerror="this.style.display='none'">
+          <span class="logo-text">LAUNCHPLACE.IO</span>
+        </a>
+      </div>
+
+      <ul class="nav-menu" role="menubar">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="portfolio.html" class="nav-link active">Portfolio</a></li>
+        <li class="nav-item-dropdown">
+          <a href="career.html" class="nav-link">Careers</a>
+        </li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="contact.html#contact-form" class="nav-cta">Get Started</a></li>
+      </ul>
+
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="portfolio-hero" aria-labelledby="portfolio-heading">
+    <div class="container">
+      <h1 id="portfolio-heading">Our Work Speaks for Itself</h1>
+      <p>Explore our successful projects and see how we've helped businesses like yours thrive online</p>
+    </div>
+  </section>
+
+  <!-- Filters + grid -->
+  <section class="portfolio-section">
+    <div class="container">
+      <div class="portfolio-filters" role="toolbar" aria-label="Portfolio filters">
+        <button class="filter-btn active" data-filter="all">All Projects</button>
+        <button class="filter-btn" data-filter="ecommerce">E-commerce</button>
+        <button class="filter-btn" data-filter="business">Business Websites</button>
+        <button class="filter-btn" data-filter="portfolio">Portfolio Sites</button>
+        <button class="filter-btn" data-filter="redesign">Redesigns</button>
+      </div>
+
+      <div class="portfolio-grid" id="portfolioGrid">
+        <!-- Project item examples -->
+        <div class="portfolio-item" data-category="ecommerce" data-aos="fade-up">
+          <div class="portfolio-image">Urban Style Fashion
+            <div class="portfolio-overlay">
+              <a href="#" class="view-project" data-project="project1">View Project</a>
+            </div>
+          </div>
+          <div class="portfolio-content">
+            <h3>Urban Style Fashion Store</h3>
+            <p>Complete e-commerce solution with 150+ products, secure payment gateway, and inventory management system.</p>
+            <div class="portfolio-tags">
+              <span class="portfolio-tag">E-commerce</span>
+              <span class="portfolio-tag">React</span>
+              <span class="portfolio-tag">Payment Gateway</span>
+            </div>
+            <span class="package-tag">E-commerce Package</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-category="business" data-aos="fade-up" data-aos-delay="100">
+          <div class="portfolio-image">Excel Consultants
+            <div class="portfolio-overlay">
+              <a href="#" class="view-project" data-project="project2">View Project</a>
+            </div>
+          </div>
+          <div class="portfolio-content">
+            <h3>Excel Business Consultants</h3>
+            <p>Professional corporate website with service pages, client portal, and integrated blog system.</p>
+            <div class="portfolio-tags">
+              <span class="portfolio-tag">Business</span>
+              <span class="portfolio-tag">WordPress</span>
+              <span class="portfolio-tag">Blog</span>
+            </div>
+            <span class="package-tag">Professional Package</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-category="business" data-aos="fade-up" data-aos-delay="200">
+          <div class="portfolio-image">Spice Garden
+            <div class="portfolio-overlay">
+              <a href="#" class="view-project" data-project="project3">View Project</a>
+            </div>
+          </div>
+          <div class="portfolio-content">
+            <h3>Spice Garden Restaurant</h3>
+            <p>Beautiful restaurant website with online menu, table booking system, and food delivery integration.</p>
+            <div class="portfolio-tags">
+              <span class="portfolio-tag">Restaurant</span>
+              <span class="portfolio-tag">Booking System</span>
+              <span class="portfolio-tag">Food Delivery</span>
+            </div>
+            <span class="package-tag">Professional Package</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-category="portfolio" data-aos="fade-up">
+          <div class="portfolio-image">Creative Studio
+            <div class="portfolio-overlay">
+              <a href="#" class="view-project" data-project="project4">View Project</a>
+            </div>
+          </div>
+          <div class="portfolio-content">
+            <h3>Creative Design Studio</h3>
+            <p>Portfolio website for a creative agency with project galleries, team pages, and contact forms.</p>
+            <div class="portfolio-tags">
+              <span class="portfolio-tag">Portfolio</span>
+              <span class="portfolio-tag">Creative</span>
+              <span class="portfolio-tag">Gallery</span>
+            </div>
+            <span class="package-tag">Basic Package</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-category="redesign" data-aos="fade-up" data-aos-delay="100">
+          <div class="portfolio-image">Tech Solutions
+            <div class="portfolio-overlay">
+              <a href="#" class="view-project" data-project="project5">View Project</a>
+            </div>
+          </div>
+          <div class="portfolio-content">
+            <h3>Tech Solutions Inc.</h3>
+            <p>Complete website redesign with modern UI/UX, improved navigation, and mobile optimization.</p>
+            <div class="portfolio-tags">
+              <span class="portfolio-tag">Redesign</span>
+              <span class="portfolio-tag">UI/UX</span>
+              <span class="portfolio-tag">Mobile First</span>
+            </div>
+            <span class="package-tag">Redesign Service</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-category="ecommerce" data-aos="fade-up" data-aos-delay="200">
+          <div class="portfolio-image">Home Decor
+            <div class="portfolio-overlay">
+              <a href="#" class="view-project" data-project="project6">View Project</a>
+            </div>
+          </div>
+          <div class="portfolio-content">
+            <h3>Home Decor Marketplace</h3>
+            <p>Multi-vendor e-commerce platform with vendor dashboards, product reviews, and advanced filtering.</p>
+            <div class="portfolio-tags">
+              <span class="portfolio-tag">E-commerce</span>
+              <span class="portfolio-tag">Multi-vendor</span>
+              <span class="portfolio-tag">Marketplace</span>
+            </div>
+            <span class="package-tag">E-commerce Package</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="portfolio-stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item" data-aos="fade-up">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Projects Completed</div>
+        </div>
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-number">95%</div>
+          <div class="stat-label">Client Satisfaction</div>
+        </div>
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+          <div class="stat-number">2M+</div>
+          <div class="stat-label">Revenue Generated</div>
+        </div>
+        <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+          <div class="stat-number">15+</div>
+          <div class="stat-label">Industries Served</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="container">
+      <div class="section-header" style="text-align:center;margin-bottom:24px">
+        <h2 style="margin:0 0 .5rem;color:#fff">What Our Clients Say</h2>
+        <p style="margin:0;color:rgba(255,255,255,0.8)">Don't just take our word for it - hear from our satisfied clients</p>
+      </div>
+      <div class="testimonial-grid">
+        <div class="testimonial-card" data-aos="fade-up">
+          <div class="testimonial-text">"LaunchPlace.io built our e-commerce store in just 3 weeks. Our online sales have increased by 300% since launch!"</div>
+          <div class="testimonial-author" style="display:flex;gap:10px;align-items:center">
+            <div class="author-avatar">RK</div>
+            <div class="author-info">
+              <h4 style="margin:0;color:#fff">Raj Kumar</h4>
+              <p style="margin:0;color:rgba(255,255,255,0.8)">Owner, Urban Style Fashion</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="testimonial-text">"As a small business owner, I needed a professional website without the complexity. LaunchPlace.io made it so easy!"</div>
+          <div class="testimonial-author" style="display:flex;gap:10px;align-items:center">
+            <div class="author-avatar">PP</div>
+            <div class="author-info">
+              <h4 style="margin:0;color:#fff">Priya Patel</h4>
+              <p style="margin:0;color:rgba(255,255,255,0.8)">Founder, Excel Consultants</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="testimonial-text">"The team understood our vision perfectly and delivered beyond our expectations. The website has transformed our business."</div>
+          <div class="testimonial-author" style="display:flex;gap:10px;align-items:center">
+            <div class="author-avatar">AK</div>
+            <div class="author-info">
+              <h4 style="margin:0;color:#fff">Amit Khanna</h4>
+              <p style="margin:0;color:rgba(255,255,255,0.8)">CEO, Spice Garden Restaurant</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container" style="text-align:center;padding:48px 0">
+      <h2 style="margin:0 0 .5rem;color:#fff">Ready to Create Your Success Story?</h2>
+      <p style="margin:0 0 16px;color:rgba(255,255,255,0.9)">Let's build something amazing together for your business</p>
+      <a href="contact.html" class="nav-cta" style="display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px">
+        Start Your Project <i class="fas fa-rocket"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Project Modal sample (project1) -->
+  <div id="project1-modal" class="project-modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="close-modal" aria-label="Close">&times;</button>
+      <div class="modal-image">Urban Style Fashion Store</div>
+      <div class="modal-body">
+        <h2 id="modal-title" style="color:var(--primary);margin-top:0">Urban Style Fashion E-commerce Store</h2>
+        <div class="project-details">
+          <div class="project-description">
+            <h3>Project Overview</h3>
+            <p>Urban Style Fashion needed a complete e-commerce solution to showcase their 150+ fashion products and handle online sales efficiently. The project involved creating a visually appealing store with advanced filtering, secure payments, and inventory management.</p>
+            <h3>Challenge</h3>
+            <p>The client required a system that could handle multiple product variations, manage inventory in real-time, and provide a seamless shopping experience across all devices while maintaining fast loading speeds.</p>
+            <div class="project-results">
+              <h4 style="color:var(--primary);">Results Achieved</h4>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">
+                <div style="text-align:center">
+                  <div style="font-weight:800;color:var(--primary);font-size:1.25rem">300%</div>
+                  <div style="color:rgba(0,0,0,0.6)">Sales Increase</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-weight:800;color:var(--primary);font-size:1.25rem">45%</div>
+                  <div style="color:rgba(0,0,0,0.6)">Mobile Traffic</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-weight:800;color:var(--primary);font-size:1.25rem">2.8s</div>
+                  <div style="color:rgba(0,0,0,0.6)">Avg. Load Time</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-weight:800;color:var(--primary);font-size:1.25rem">4.8/5</div>
+                  <div style="color:rgba(0,0,0,0.6)">User Rating</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="project-features">
+            <h3>Key Features</h3>
+            <ul class="features-list" style="padding-left:0;margin:0">
+              <li>Advanced product filtering</li>
+              <li>Secure payment gateway integration</li>
+              <li>Real-time inventory management</li>
+              <li>Customer review system</li>
+              <li>Mobile-responsive design</li>
+            </ul>
+            <h3 style="margin-top:1rem">Technologies Used</h3>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span class="portfolio-tag">React</span>
+              <span class="portfolio-tag">Node.js</span>
+              <span class="portfolio-tag">MongoDB</span>
+              <span class="portfolio-tag">Stripe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="logo">
+            <a href="index.html" aria-label="LaunchPlace home" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+              <img src="logo.svg" alt="LaunchPlace logo" width="40" height="40" onerror="this.style.display='none'">
+              <span class="logo-text">LAUNCHPLACE.IO</span>
+            </a>
+          </div>
+          <p style="color:rgba(255,255,255,0.85)">Professional websites for small businesses. Fast, affordable, and effective.</p>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="career.html#careers-section">Careers</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Services</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><a href="#">Website Development</a></li>
+            <li><a href="#">E-commerce Stores</a></li>
+            <li><a href="#">Website Redesign</a></li>
+            <li><a href="#">SEO Optimization</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <ul style="list-style:none;padding-left:0">
+            <li><i class="fas fa-envelope"></i> launchplaceio@gmail.com</li>
+            <li><i class="fas fa-phone"></i> +91 79759 40152</li>
+            <li><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year">2025</span> LaunchPlace.io. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts: AOS + interactions + particle bg -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    // set year
+    (function(){ try{ document.getElementById('current-year').textContent = new Date().getFullYear(); }catch(e){} })();
+
+    // init AOS
+    AOS.init({duration:800,once:true});
+
+    // Particle BG (canvas) - tuned to same palette
+    (function(){
+      const canvas = document.getElementById('bgCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d',{alpha:true});
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+      const DPR = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = w * DPR; canvas.height = h * DPR;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.scale(DPR,DPR);
+
+      const colors = [
+        'rgba(180,122,255,0.32)',
+        'rgba(255,77,166,0.30)',
+        'rgba(124,58,237,0.28)'
+      ];
+      function rand(min,max){return Math.random()*(max-min)+min}
+
+      const particleCount = Math.min(130, Math.floor((w*h)/8000));
+      const particles = [];
+      function Particle(){
+        this.x = rand(0,w); this.y = rand(0,h);
+        this.r = rand(1.2,6);
+        this.vx = rand(-0.25,0.6);
+        this.vy = rand(-0.25,0.6);
+        this.color = colors[Math.floor(Math.random()*colors.length)];
+        this.alpha = rand(0.18,0.85);
+      }
+      for(let i=0;i<particleCount;i++) particles.push(new Particle());
+
+      function draw(){
+        ctx.clearRect(0,0,w,h);
+        const gradient = ctx.createRadialGradient(w*0.15,h*0.12,0,w*0.7,h*0.8,Math.max(w,h));
+        gradient.addColorStop(0,'rgba(180,122,255,0.12)');
+        gradient.addColorStop(1,'rgba(0,0,0,0.9)');
+        ctx.fillStyle = gradient; ctx.fillRect(0,0,w,h);
+
+        for(let p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -30) p.x = w + 30; if(p.x > w+30) p.x = -30;
+          if(p.y < -30) p.y = h + 30; if(p.y > h+30) p.y = -30;
+
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.globalAlpha = p.alpha * 0.35;
+          ctx.arc(p.x,p.y,p.r*3.4,0,Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // lines between nearby particles
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx = a.x-b.x, dy = a.y-b.y; const d = Math.sqrt(dx*dx+dy*dy);
+            if(d < 120){
+              ctx.beginPath();
+              const alpha = 0.05 * (1 - d/120);
+              ctx.strokeStyle = 'rgba(212,196,255,'+alpha+')';
+              ctx.lineWidth = 1;
+              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }
+        }
+      }
+
+      let raf;
+      function loop(){ draw(); raf = requestAnimationFrame(loop); }
+      loop();
+
+      window.addEventListener('resize', ()=> {
+        cancelAnimationFrame(raf);
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        canvas.width = w * DPR; canvas.height = h * DPR;
+        canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+        loop();
+      });
+
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(mq.matches){ cancelAnimationFrame(raf); }
+    })();
+
+    // mobile nav toggle (class-based)
+    (function(){
+      const btn = document.querySelector('.hamburger');
+      const menu = document.querySelector('.nav-menu');
+      if(!btn || !menu) return;
+      btn.addEventListener('click', ()=>{
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        btn.classList.toggle('active');
+        menu.classList.toggle('active');
+      });
+    })();
+
+    // navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('.navbar');
+      if (!nav) return;
+      if (window.scrollY > 10) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+
+    // portfolio filter logic + modal behavior
+    document.addEventListener('DOMContentLoaded', function(){
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const items = document.querySelectorAll('.portfolio-item');
+
+      filterButtons.forEach(btn=>btn.addEventListener('click', function(){
+        filterButtons.forEach(b=>b.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.getAttribute('data-filter');
+        items.forEach(it=>{
+          const cat = it.getAttribute('data-category');
+          if(filter === 'all' || cat === filter){
+            it.classList.remove('hidden');
+            it.style.display = '';
+            setTimeout(()=>{ it.style.opacity='1'; it.style.transform='scale(1)'; }, 30);
+          } else {
+            it.style.opacity='0';
+            it.style.transform='scale(.96)';
+            setTimeout(()=>{ it.classList.add('hidden'); }, 260);
+          }
+        });
+      }));
+
+      // project modal open/close
+      const viewBtns = document.querySelectorAll('.view-project');
+      const modals = document.querySelectorAll('.project-modal');
+      const closeBtns = document.querySelectorAll('.close-modal');
+
+      viewBtns.forEach(b=>{
+        b.addEventListener('click', function(e){
+          e.preventDefault();
+          const projectId = this.getAttribute('data-project');
+          const modal = document.getElementById(projectId + '-modal');
+          if(modal){
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden','false');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+      });
+      closeBtns.forEach(b=>b.addEventListener('click', function(){
+        const m = this.closest('.project-modal');
+        if(m){
+          m.style.display='none';
+          m.setAttribute('aria-hidden','true');
+          document.body.style.overflow = 'auto';
+        }
+      }));
+      modals.forEach(m=>m.addEventListener('click', function(e){
+        if(e.target === this){
+          this.style.display='none';
+          this.setAttribute('aria-hidden','true');
+          document.body.style.overflow = 'auto';
+        }
+      }));
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+          modals.forEach(m=>{
+            m.style.display='none';
+            m.setAttribute('aria-hidden','true');
+          });
+          document.body.style.overflow='auto';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

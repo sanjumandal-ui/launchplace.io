@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact Us - LaunchPlace.io</title>
+
+  <!-- Icons & AOS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+
+  <style>
+    :root{
+      /* unified palette with homepage/careers */
+      --primary:#7c3aed;             /* rich purple */
+      --primary-dark:#3b0b7a;        /* deep indigo */
+      --primary-light:#b47aff;       /* neon lavender */
+      --secondary:#ff4da6;           /* neon pink */
+      --accent:#d8b4fe;              /* soft lavender glow */
+      --text:#ffffff;
+      --text-light:#cfcfe0;
+      --background:#000000;          /* pure black base */
+      --background-alt:#0f0f12;
+      --border:rgba(255,255,255,0.06);
+      --shadow:0 6px 18px rgba(0,0,0,0.7);
+      --shadow-lg:0 20px 50px rgba(0,0,0,0.9);
+      --max-width:1200px;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--background);
+      color:var(--text);
+      font-family:Inter,system-ui,Arial;
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    /* canvas background */
+    #bgCanvas{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      mix-blend-mode:screen;
+      opacity:0.95;
+    }
+    .bg-gradient-overlay{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(180,122,255,0.22), transparent 55%),
+        radial-gradient(circle at 90% 100%, rgba(255,77,166,0.25), transparent 60%),
+        linear-gradient(180deg, rgba(3,7,18,0.8), rgba(0,0,0,0.98));
+    }
+
+    .container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 20px;
+      position:relative;
+      z-index:5;
+    }
+
+    /* NAV (match homepage / careers) */
+    .navbar{
+      background:linear-gradient(90deg, #b47aff, #d7b9ff, #c491ff);
+      backdrop-filter: blur(12px);
+      box-shadow:0 2px 20px rgba(180,110,255,0.25);
+      position:fixed;
+      width:100%;
+      top:0;
+      z-index:1000;
+      transition:all 0.3s ease;
+    }
+    .navbar.scrolled{
+      background:linear-gradient(90deg, #c490ff, #e7d6ff);
+      box-shadow:0 5px 30px rgba(180,110,255,0.4);
+    }
+    .nav-container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:0 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      height:80px;
+    }
+    .logo a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:inherit;
+    }
+    .logo img{
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      display:block;
+      box-shadow:0 0 18px rgba(180,122,255,0.6);
+    }
+    .logo-text{
+      font-weight:800;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:#fff;
+      font-size:.92rem;
+    }
+
+    .nav-menu{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      list-style:none;
+      margin:0;
+      padding:0;
+      text-transform:uppercase;
+      font-size:.75rem;
+      letter-spacing:.12em;
+    }
+    .nav-link{
+      color:rgba(255,255,255,0.9);
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:600;
+      transition:.2s;
+    }
+    .nav-link:hover,
+    .nav-link.active{
+      background:rgba(0,0,0,0.18);
+      color:#fff;
+      box-shadow:0 0 14px rgba(148,163,255,0.5);
+    }
+    .nav-cta{
+      background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+      padding:8px 14px;
+      border-radius:999px;
+      color:white !important;
+      text-decoration:none;
+      font-weight:700;
+      box-shadow:0 0 22px rgba(180,122,255,0.65);
+      border:1px solid rgba(255,255,255,0.18);
+    }
+
+    .hamburger{
+      display:none;
+      flex-direction:column;
+      gap:6px;
+      width:34px;
+      cursor:pointer;
+    }
+    .hamburger span{
+      height:3px;
+      background:#fff;
+      display:block;
+      border-radius:3px;
+      opacity:0.9;
+      transition:.3s;
+    }
+    .hamburger.active span:nth-child(1){
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+    .hamburger.active span:nth-child(2){
+      opacity:0;
+    }
+    .hamburger.active span:nth-child(3){
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    /* HERO */
+    .contact-hero{
+      padding:160px 0 100px;
+      margin-top:0;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .contact-hero h1{
+      font-size:3rem;
+      margin:0 0 1rem;
+      letter-spacing:-0.02em;
+    }
+    .contact-hero p{
+      font-size:1.1rem;
+      color:rgba(255,255,255,0.9);
+      max-width:760px;
+      margin:0 auto;
+    }
+
+    /* CONTACT LAYOUT */
+    .contact-section{
+      padding:0 0 80px;
+    }
+    .contact-content{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:3.5rem;
+      padding:40px 0 0;
+    }
+
+    .contact-info-card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.35));
+      border-radius:16px;
+      padding:2rem;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.06);
+      backdrop-filter:blur(14px);
+    }
+    .contact-info-card h2{
+      color:var(--primary-light);
+      margin-bottom:1rem;
+    }
+    .contact-method{
+      display:flex;
+      align-items:flex-start;
+      gap:1rem;
+      padding-bottom:1rem;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      margin-bottom:1rem;
+    }
+    .contact-icon{
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:1.2rem;
+      background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+      flex-shrink:0;
+      box-shadow:0 0 18px rgba(180,122,255,0.7);
+    }
+    .contact-details h3{
+      margin:0;
+      color:#fff;
+    }
+    .contact-details p{
+      color:rgba(255,255,255,0.8);
+      margin:0 0 .25rem;
+      font-size:.95rem;
+    }
+    .contact-link{
+      color:var(--accent);
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    .business-hours{
+      margin-top:1rem;
+    }
+    .business-hours h3{
+      margin:0 0 .5rem;
+    }
+    .hours-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      font-size:.9rem;
+    }
+    .hours-list li{
+      display:flex;
+      justify-content:space-between;
+      padding:.5rem 0;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+
+    .social-contact{
+      display:flex;
+      gap:10px;
+      margin-top:1rem;
+    }
+    .social-contact a{
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,0.02);
+      color:var(--primary-light);
+      text-decoration:none;
+      box-shadow:0 0 12px rgba(180,122,255,0.5);
+    }
+
+    .form-container{
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
+      border-radius:16px;
+      padding:2rem;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.06);
+      backdrop-filter:blur(14px);
+    }
+    .form-container h2{
+      color:var(--primary-light);
+      margin-bottom:1rem;
+    }
+    .form-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+    }
+    .form-group{
+      margin-bottom:1rem;
+      opacity:0;
+      transform:translateY(20px);
+      animation:fadeInUp .6s ease forwards;
+    }
+    .form-label{
+      display:block;
+      margin-bottom:.5rem;
+      font-weight:600;
+      color:#fff;
+      font-size:.9rem;
+    }
+    .form-control{
+      width:100%;
+      padding:.85rem;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.16);
+      background:rgba(15,23,42,0.85);
+      color:#f9fafb;
+      font-size:.9rem;
+    }
+    .form-control:focus{
+      outline:none;
+      box-shadow:0 0 0 3px rgba(180,122,255,0.4);
+      border-color:var(--primary-light);
+    }
+    textarea.form-control{
+      min-height:140px;
+      resize:vertical;
+    }
+    .submit-btn{
+      background:linear-gradient(120deg,var(--secondary),var(--primary-light));
+      color:#fff;
+      border:none;
+      padding:12px 18px;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:.6rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      box-shadow:0 0 20px rgba(180,122,255,0.6);
+    }
+    .form-notification{
+      padding:1rem;
+      border-radius:8px;
+      margin-top:1rem;
+      display:none;
+      font-size:.9rem;
+    }
+    .form-notification.success{
+      background:#d1fae5;
+      color:#065f46;
+      border:1px solid #a7f3d0;
+      display:block;
+    }
+    .form-notification.error{
+      background:#fee2e2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+      display:block;
+    }
+
+    /* FAQ / map */
+    .faq-contact{
+      padding:40px 0 80px;
+      background:transparent;
+    }
+    .faq-contact-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:1rem;
+    }
+    .faq-contact-item{
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
+      padding:1rem;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.06);
+      font-size:.95rem;
+    }
+    .faq-contact-item h3{
+      margin:0 0 .4rem;
+      font-size:1rem;
+    }
+    .faq-contact-item p{
+      margin:0;
+      color:rgba(255,255,255,0.9);
+    }
+
+    .map-container{
+      height:300px;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      margin-top:1.5rem;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    .map-placeholder{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,var(--primary-light),var(--secondary));
+      color:#fff;
+    }
+
+    /* CTA */
+    .cta{
+      background:linear-gradient(180deg, rgba(124,58,237,0.95), rgba(255,77,166,0.92));
+      margin-top:0;
+    }
+
+    @keyframes fadeInUp{
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    /* responsive */
+    @media (max-width:1000px){
+      .contact-hero h1{font-size:2.4rem}
+      .container{padding:0 18px}
+    }
+    @media (max-width:800px){
+      .contact-content{
+        grid-template-columns:1fr;
+        gap:2rem;
+      }
+      .nav-menu{
+        display:none;
+        position:fixed;
+        top:80px;
+        right:0;
+        left:0;
+        background:rgba(3,7,18,0.98);
+        padding:16px 20px 20px;
+        border-radius:0 0 18px 18px;
+        box-shadow:0 18px 40px rgba(0,0,0,0.95);
+        flex-direction:column;
+        width:100%;
+      }
+      .nav-menu.active{
+        display:flex;
+      }
+      .hamburger{display:flex}
+    }
+    @media (max-width:480px){
+      .contact-hero{padding:140px 0 80px}
+      .form-row{grid-template-columns:1fr}
+      .map-container{height:220px}
+      .cta .container{padding:0 16px}
+    }
+
+    /* footer */
+    footer{
+      background:rgba(0,0,0,0.96);
+      border-top:1px solid rgba(255,255,255,0.06);
+      padding:28px 0 0;
+      margin-top:0;
+      position:relative;
+      z-index:5;
+    }
+    .footer-content{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      gap:12px;
+    }
+    .footer-section h3{
+      margin:0 0 .5rem;
+      color:rgba(255,255,255,0.95);
+      font-size:1rem;
+    }
+    footer a{
+      color:rgba(255,255,255,0.9);
+      text-decoration:none;
+      font-size:.9rem;
+    }
+    footer a:hover{
+      color:var(--accent);
+    }
+    .footer-bottom{
+      text-align:center;
+      color:rgba(255,255,255,0.55);
+      margin-top:14px;
+      padding:10px 0 16px;
+      font-size:.85rem;
+    }
+
+    @media (max-width:900px){
+      .footer-content{grid-template-columns:1fr 1fr;}
+    }
+    @media (max-width:600px){
+      .footer-content{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <!-- animated background canvas + overlay -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="bg-gradient-overlay" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="index.html" aria-label="LaunchPlace home">
+          <img src="logo.svg" alt="LaunchPlace logo" width="44" height="44" onerror="this.style.display='none'">
+          <span class="logo-text">LAUNCHPLACE.IO</span>
+        </a>
+      </div>
+
+      <ul class="nav-menu" role="menubar">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+        <li><a href="contact.html" class="nav-link active">Contact</a></li>
+        <li><a href="#contact-form" class="nav-cta">Get Started</a></li>
+      </ul>
+
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="contact-hero" aria-labelledby="contact-heading">
+    <div class="container">
+      <h1 id="contact-heading">Let's Build Your Dream Website</h1>
+      <p>Get in touch for a free consultation — we'll help bring your vision to life with a professional website that drives results.</p>
+    </div>
+  </section>
+
+  <!-- CONTACT CONTENT -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="contact-content">
+        <!-- info -->
+        <div class="contact-info-card" data-aos="fade-right">
+          <h2>Get In Touch</h2>
+
+          <div class="contact-method">
+            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+            <div class="contact-details">
+              <h3>Email Us</h3>
+              <p>We'll respond within 24 hours</p>
+              <a href="mailto:launchplaceio@gmail.com" class="contact-link">launchplaceio@gmail.com</a>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="contact-icon"><i class="fas fa-phone"></i></div>
+            <div class="contact-details">
+              <h3>Call Us</h3>
+              <p>Mon-Fri from 9am to 6pm</p>
+              <a href="tel:+917975940152" class="contact-link">+91 79759 40152</a>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="contact-icon"><i class="fas fa-comments"></i></div>
+            <div class="contact-details">
+              <h3>WhatsApp</h3>
+              <p>Quick responses for urgent queries</p>
+              <a href="https://wa.me/917975940152" class="contact-link">Message on WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="business-hours">
+            <h3>Business Hours</h3>
+            <ul class="hours-list">
+              <li><span>Monday - Friday</span> <span>9:00 AM - 6:00 PM</span></li>
+              <li><span>Saturday</span> <span>10:00 AM - 4:00 PM</span></li>
+              <li><span>Sunday</span> <span>Closed</span></li>
+            </ul>
+          </div>
+
+          <div class="social-contact">
+            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+
+        <!-- form -->
+        <div class="form-container" data-aos="fade-left" id="contact-form">
+          <h2>Get Your Free Consultation</h2>
+          <form id="consultation-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" id="firstName" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" id="lastName" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" id="email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input type="tel" id="phone" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="service" class="form-label">Service Interested In</label>
+              <select id="service" class="form-control" required>
+                <option value="" disabled selected>Select a service</option>
+                <option value="basic">Basic Website (₹14,999)</option>
+                <option value="professional">Professional Website (₹34,999)</option>
+                <option value="ecommerce">E-commerce Store (₹64,999)</option>
+                <option value="redesign">Website Redesign</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">Project Details</label>
+              <textarea id="message" class="form-control" placeholder="Tell us about your project, timeline, and any specific requirements..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+              <span>Send Message</span>
+              <i class="fas fa-paper-plane"></i>
+            </button>
+
+            <div id="form-notification" class="form-notification" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ + map -->
+  <section class="faq-contact">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:20px">
+        <h2 style="margin:0 0 .5rem">Common Questions</h2>
+        <p style="margin:0;color:rgba(255,255,255,0.8)">Quick answers to frequently asked questions about our process</p>
+      </div>
+
+      <div class="faq-contact-grid">
+        <div class="faq-contact-item" data-aos="fade-up">
+          <h3><i class="fas fa-clock"></i> How soon can you start?</h3>
+          <p>We can typically begin your project within 1-3 days of receiving your requirements and initial payment.</p>
+        </div>
+        <div class="faq-contact-item" data-aos="fade-up" data-aos-delay="100">
+          <h3><i class="fas fa-money-bill-wave"></i> What's the payment process?</h3>
+          <p>We require a 50% deposit to start, with the remaining 50% due upon project completion.</p>
+        </div>
+        <div class="faq-contact-item" data-aos="fade-up" data-aos-delay="200">
+          <h3><i class="fas fa-redo"></i> Do you offer revisions?</h3>
+          <p>Yes! We include 3 rounds of revisions in all our packages to ensure you're completely satisfied.</p>
+        </div>
+        <div class="faq-contact-item" data-aos="fade-up" data-aos-delay="300">
+          <h3><i class="fas fa-server"></i> What about hosting?</h3>
+          <p>We can help you set up hosting or recommend reliable providers. Hosting is not included in our packages.</p>
+        </div>
+      </div>
+
+      <div class="map-container" data-aos="zoom-in">
+        <div class="map-placeholder">
+          <div style="text-align:center">
+            <i class="fas fa-map-marker-alt" style="font-size:2.4rem;margin-bottom:8px"></i>
+            <div style="font-weight:700">Based in India</div>
+            <div style="opacity:.9">Serving clients worldwide</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container" style="text-align:center;padding:36px 0">
+      <h2 style="margin:0 0 .5rem">Ready to Start Your Project?</h2>
+      <p style="margin:0 0 12px;color:rgba(255,255,255,0.9)">Contact us today and let's discuss how we can help grow your business online</p>
+      <div style="display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <a href="tel:+917975940152" class="nav-cta">Call Now <i class="fas fa-phone" style="margin-left:8px"></i></a>
+        <a href="https://wa.me/917975940152" class="nav-cta" style="background:transparent;border:1px solid rgba(255,255,255,0.3);box-shadow:none;">WhatsApp <i class="fab fa-whatsapp" style="margin-left:8px"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="logo">
+            <a href="index.html" aria-label="LaunchPlace home" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+              <img src="logo.svg" alt="LaunchPlace logo" width="40" height="40" onerror="this.style.display='none'">
+              <span class="logo-text">LAUNCHPLACE.IO</span>
+            </a>
+          </div>
+          <p style="color:rgba(255,255,255,0.85)">Professional websites for small businesses. Fast, affordable, and effective.</p>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style:none;padding-left:0;margin:0">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Services</h3>
+          <ul style="list-style:none;padding-left:0;margin:0">
+            <li><a href="#">Website Development</a></li>
+            <li><a href="#">E-commerce Stores</a></li>
+            <li><a href="#">Website Redesign</a></li>
+            <li><a href="#">SEO Optimization</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <ul style="list-style:none;padding-left:0;margin:0">
+            <li><i class="fas fa-envelope"></i> launchplaceio@gmail.com</li>
+            <li><i class="fas fa-phone"></i> +91 79759 40152</li>
+            <li><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; <span id="current-year">2025</span> LaunchPlace.io. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    // set year
+    try { document.getElementById('current-year').textContent = new Date().getFullYear(); } catch(e){}
+
+    // initialize AOS
+    AOS.init({ duration: 800, once: true });
+
+    // PARTICLE BACKGROUND (canvas) — tuned to lavender / pink
+    (function(){
+      const canvas = document.getElementById('bgCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d',{alpha:true});
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+      const DPR = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = w * DPR; canvas.height = h * DPR;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.scale(DPR,DPR);
+
+      const colors = [
+        'rgba(180,122,255,0.32)',   // lavender
+        'rgba(255,77,166,0.30)',    // neon pink
+        'rgba(124,58,237,0.28)'     // purple
+      ];
+      function rand(min,max){return Math.random()*(max-min)+min}
+
+      const particleCount = Math.min(130, Math.floor((w*h)/8000));
+      const particles = [];
+      function Particle(){
+        this.x = rand(0,w); this.y = rand(0,h);
+        this.r = rand(1.2,6);
+        this.vx = rand(-0.25,0.6);
+        this.vy = rand(-0.25,0.6);
+        this.color = colors[Math.floor(Math.random()*colors.length)];
+        this.alpha = rand(0.18,0.85);
+      }
+      for(let i=0;i<particleCount;i++) particles.push(new Particle());
+
+      function draw(){
+        ctx.clearRect(0,0,w,h);
+        const gradient = ctx.createRadialGradient(w*0.15,h*0.12,0,w*0.7,h*0.8,Math.max(w,h));
+        gradient.addColorStop(0,'rgba(180,122,255,0.12)');
+        gradient.addColorStop(1,'rgba(0,0,0,0.9)');
+        ctx.fillStyle = gradient; ctx.fillRect(0,0,w,h);
+
+        for(let p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -30) p.x = w + 30; if(p.x > w+30) p.x = -30;
+          if(p.y < -30) p.y = h + 30; if(p.y > h+30) p.y = -30;
+
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.globalAlpha = p.alpha * 0.35;
+          ctx.arc(p.x,p.y,p.r*3.4,0,Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // connecting lines
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx = a.x-b.x, dy = a.y-b.y; const d = Math.sqrt(dx*dx+dy*dy);
+            if(d < 120){
+              ctx.beginPath();
+              const alpha = 0.05 * (1 - d/120);
+              ctx.strokeStyle = 'rgba(212,196,255,'+alpha+')';
+              ctx.lineWidth = 1;
+              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }
+        }
+      }
+
+      let raf;
+      function loop(){ draw(); raf = requestAnimationFrame(loop); }
+      loop();
+
+      window.addEventListener('resize', ()=> {
+        cancelAnimationFrame(raf);
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        canvas.width = w * DPR; canvas.height = h * DPR;
+        canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+        loop();
+      });
+
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(mq.matches){ cancelAnimationFrame(raf); }
+    })();
+
+    // mobile menu toggle (using .nav-menu.active)
+    (function(){
+      const btn = document.querySelector('.hamburger');
+      const menu = document.querySelector('.nav-menu');
+      if(!btn || !menu) return;
+      btn.addEventListener('click', ()=>{
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        btn.classList.toggle('active');
+        menu.classList.toggle('active');
+      });
+    })();
+
+    // navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('.navbar');
+      if (!nav) return;
+      if (window.scrollY > 10) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+
+    // Contact form submit simulation
+    (function(){
+      const form = document.getElementById('consultation-form');
+      if(!form) return;
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const btn = this.querySelector('.submit-btn');
+        const original = btn.innerHTML;
+        const notification = document.getElementById('form-notification');
+
+        btn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin" style="margin-left:8px"></i>';
+        btn.disabled = true;
+
+        setTimeout(()=>{
+          notification.className = 'form-notification success';
+          notification.innerHTML = '<strong>Thank you!</strong> Your message has been sent successfully. We\'ll get back to you within 24 hours.';
+          this.reset();
+          btn.innerHTML = original;
+          btn.disabled = false;
+          notification.scrollIntoView({behavior:'smooth',block:'center'});
+        }, 1600);
+      });
+    })();
+  </script>
+</body>
+</html>
